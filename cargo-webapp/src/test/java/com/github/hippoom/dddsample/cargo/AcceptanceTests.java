@@ -1,4 +1,4 @@
-package com.github.hippoom.dddsample;
+package com.github.hippoom.dddsample.cargo;
 
 import org.junit.runner.RunWith;
 

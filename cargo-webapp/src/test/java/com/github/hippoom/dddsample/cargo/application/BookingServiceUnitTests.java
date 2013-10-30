@@ -1,4 +1,4 @@
-package com.github.hippoom.dddsample;
+package com.github.hippoom.dddsample.cargo.application;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -12,8 +12,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.github.hippoom.dddsample.cargo.RegisterCargoCommand;
+import com.github.hippoom.dddsample.cargo.application.BookingService;
 import com.github.hippoom.dddsample.cargo.axon.GenericCommandGateway;
+import com.github.hippoom.dddsample.cargo.command.RegisterCargoCommand;
 import com.github.hippoom.dddsample.cargo.core.TrackingId;
 import com.github.hippoom.dddsample.cargo.core.UnLocode;
 

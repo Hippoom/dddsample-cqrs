@@ -3,6 +3,7 @@ package com.github.hippoom.dddsample.cargo.core;
 import java.util.regex.Pattern;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 /**
@@ -11,7 +12,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class UnLocode {
-
+	@Getter
 	private String unlocode;
 
 	// Country code is exactly two letters.

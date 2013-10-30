@@ -1,14 +1,16 @@
-package com.github.hippoom.dddsample.cargo;
+package com.github.hippoom.dddsample.cargo.command;
 
 import java.util.Date;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 import com.github.hippoom.dddsample.cargo.core.UnLocode;
 
 @EqualsAndHashCode
 @ToString
+@Getter
 public class RegisterCargoCommand {
 	private final UnLocode originUnLocode;
 	private final UnLocode destinationUnLocode;
