@@ -9,6 +9,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cucumber.version>1.1.4</cucumber.version>
 		<axon.version>2.0.5</axon.version>
+		<spring.version>3.2.4.RELEASE</spring.version>
+		<hsqldb.version>2.3.0</hsqldb.version>
+		<test.suite>**/CommitTestSuite.class</test.suite>
 	</properties>
 	<dependencies>
 
@@ -24,11 +27,95 @@
 			<version>${axon.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- MVC -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- time -->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<!-- JSON -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<version>0.8.1</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.1</version>
+		</dependency>
+		<!-- persistence -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>4.2.3.Final</version>
+			<exclusions>
+				<!-- conflict with jmock -->
+				<exclusion>
+					<artifactId>cglib</artifactId>
+					<groupId>cglib</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>2.4.9</version>
+			<scope>test</scope>
+			<exclusions>
+				<!-- exclude junit-3.8.2 -->
+				<exclusion>
+					<artifactId>junit</artifactId>
+					<groupId>junit</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.github.springtestdbunit</groupId>
+			<artifactId>spring-test-dbunit</artifactId>
+			<version>1.0.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>${hsqldb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>0.6.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.dbdeploy</groupId>
+			<artifactId>dbdeploy-core</artifactId>
+			<version>3.0M3</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- general test -->
 		<dependency>
@@ -63,9 +150,21 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-spring</artifactId>
+			<version>${cucumber.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
 			<version>4.2.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -101,7 +200,7 @@
 				<version>2.15</version>
 				<configuration>
 					<includes>
-						<include>**/CommitTestSuite.class</include>
+						<include>${test.suite}</include>
 					</includes>
 					<argLine>-Dfile.encoding=UTF-8</argLine>
 				</configuration>
@@ -124,4 +223,12 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>acceptance</id>
+			<properties>
+				<test.suite>**/AcceptanceTests.class</test.suite>
+			</properties>
+		</profile>
+	</profiles>
 </project>
