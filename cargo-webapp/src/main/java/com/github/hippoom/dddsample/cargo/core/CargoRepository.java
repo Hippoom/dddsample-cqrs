@@ -1,9 +1,21 @@
 package com.github.hippoom.dddsample.cargo.core;
 
-public interface CargoRepository {
+import lombok.Setter;
 
-	TrackingId nextTrackingId();
+import org.axonframework.repository.Repository;
 
-	void store(Cargo cargo);
+public class CargoRepository {
+	@Setter
+	private Repository<Cargo> delegate;
+	@Setter
+	private AggregateIdentifierGenerator<TrackingId> identifierGenerator;
+
+	public TrackingId nextTrackingId() {
+		return identifierGenerator.nextIdentifier();
+	}
+
+	public void store(Cargo cargo) {
+		delegate.add(cargo);
+	}
 
 }

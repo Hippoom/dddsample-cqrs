@@ -14,4 +14,8 @@ public class TrackingId {
 		this.value = value;
 	}
 
+	public static TrackingId of(String value) {
+		return new TrackingId(value);
+	}
+
 }

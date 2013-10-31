@@ -4,6 +4,7 @@ import java.util.Date;
 
 import lombok.Getter;
 
+import org.axonframework.eventhandling.annotation.EventHandler;
 import org.axonframework.eventsourcing.annotation.AbstractAnnotatedAggregateRoot;
 import org.axonframework.eventsourcing.annotation.AggregateIdentifier;
 
@@ -18,10 +19,14 @@ public class Cargo extends AbstractAnnotatedAggregateRoot<TrackingId> {
 	public Cargo(TrackingId trackingId, UnLocode originUnLocode,
 			UnLocode destinationUnLocode, Date arrivalDeadline) {
 
-		this.trackingId = trackingId;
 		apply(new CargoRegisteredEvent(trackingId.getValue(),
 				originUnLocode.getUnlocode(),
 				destinationUnLocode.getUnlocode(), arrivalDeadline));
+	}
+
+	@EventHandler
+	private void on(CargoRegisteredEvent event) {
+		this.trackingId = TrackingId.of(event.getTrackingId());
 	}
 
 	/**

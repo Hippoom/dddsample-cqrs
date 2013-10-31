@@ -9,7 +9,7 @@ import com.github.hippoom.dddsample.cargo.core.Cargo;
 import com.github.hippoom.dddsample.cargo.core.CargoRepository;
 import com.github.hippoom.dddsample.cargo.core.TrackingId;
 
-public class CargoHandler {
+public class CargoCommandHandler {
 	@Setter
 	private CargoRepository cargoRepository;
 	
