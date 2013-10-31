@@ -21,6 +21,8 @@ import org.springframework.web.context.WebApplicationContext;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
 import com.github.hippoom.dddsample.cargocqrs.rest.StatusCodes;
 
+import cucumber.api.PendingException;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
@@ -84,5 +86,35 @@ public class CargoAdminSteps {
 	@Then("^the tracking id is shown for following steps$")
 	public void the_tracking_id_is_shown_for_following_steps() throws Throwable {
 		result.andExpect(jsonPath("trackingId").value(not(nullValue())));
+	}
+
+	@Given("^a cargo has been registered$")
+	public void a_cargo_has_been_registered() throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Given("^I request possible routes for the cargo$")
+	public void I_request_possible_routes_for_the_cargo() throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Given("^some routes are shown$")
+	public void some_routes_are_shown() throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@When("^I pick up a candidate$")
+	public void I_pick_up_a_candidate() throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Then("^the route is assigned to the cargo$")
+	public void the_route_is_assigned_to_the_cargo() throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
 	}
 }
