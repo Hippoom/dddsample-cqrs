@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/jdbc
+        http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+	<jdbc:initialize-database data-source="dataSource">
+		<jdbc:script location="file:src/test/scripts/sql/changelog.sql" />
+	</jdbc:initialize-database>
+
+	<bean class="com.dbdeploy.DbDeploy" init-method="go" depends-on="dataSource">
+		<property name="url" value="${runtime.persistence.jdbc.url}" />
+		<property name="userid" value="${runtime.persistence.jdbc.username}" />
+		<property name="password" value="${runtime.persistence.jdbc.password}" />
+		<property name="driver" value="${runtime.persistence.jdbc.driver}" />
+		<property name="scriptdirectory" value="src/test/scripts/sql/incremental" />
+	</bean>
+
+
+</beans>

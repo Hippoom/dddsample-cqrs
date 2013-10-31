@@ -1,4 +1,4 @@
-package com.github.hippoom.dddsample;
+package com.github.hippoom.dddsample.cargocqrs;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -18,7 +18,7 @@ public class DeploymentSmokTests {
 
 	private int getStatusCodeFromIndexPage() throws IOException,
 			ClientProtocolException {
-		return Request.Get("http://localhost:9999/cargo/index.jsp").execute()
+		return Request.Get("http://localhost:9999/cargocqrs/index.jsp").execute()
 				.returnResponse().getStatusLine().getStatusCode();
 
 	}
