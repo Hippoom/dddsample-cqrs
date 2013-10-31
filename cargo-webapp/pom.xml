@@ -217,7 +217,7 @@
 				<configuration>
 					<scanIntervalSecondes>10</scanIntervalSecondes>
 					<webAppConfig>
-						<contextPath>/cargo</contextPath>
+						<contextPath>/cargocqrs</contextPath>
 					</webAppConfig>
 				</configuration>
 			</plugin>
@@ -228,6 +228,12 @@
 			<id>acceptance</id>
 			<properties>
 				<test.suite>**/AcceptanceTests.class</test.suite>
+			</properties>
+		</profile>
+		<profile>
+			<id>deploy</id>
+			<properties>
+				<test.suite>**/DeploymentSmokTests.class</test.suite>
 			</properties>
 		</profile>
 	</profiles>

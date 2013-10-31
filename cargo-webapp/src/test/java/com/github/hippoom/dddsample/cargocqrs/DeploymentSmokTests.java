@@ -18,7 +18,7 @@ public class DeploymentSmokTests {
 
 	private int getStatusCodeFromIndexPage() throws IOException,
 			ClientProtocolException {
-		return Request.Get("http://localhost:9999/cargo/index.jsp").execute()
+		return Request.Get("http://localhost:9999/cargocqrs/index.jsp").execute()
 				.returnResponse().getStatusLine().getStatusCode();
 
 	}
