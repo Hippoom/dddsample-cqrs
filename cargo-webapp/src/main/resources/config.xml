@@ -7,11 +7,6 @@
 	http://www.springframework.org/schema/context/spring-context.xsd">
 
 
+	<context:property-placeholder location="classpath:runtime.properties" />
 
-	<import resource="classpath:query.xml" />
-	<import resource="classpath:application.xml" />
-	<import resource="classpath:domain.xml" />
-	<import resource="classpath:axon.xml" />
-	<import resource="classpath:persistence.xml" />
-	<import resource="classpath:config.xml" />
 </beans>

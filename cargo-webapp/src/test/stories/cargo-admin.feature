@@ -16,4 +16,4 @@ Given a cargo has been registered
 And I request possible routes for the cargo
 And some routes are shown
 When I pick up a candidate
-Then the route is assigned to the cargo
+Then the cargo is assigned to the route

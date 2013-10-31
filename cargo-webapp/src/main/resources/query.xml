@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:axon="http://www.axonframework.org/schema/core"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/context
-	http://www.springframework.org/schema/context/spring-context.xsd">
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.axonframework.org/schema/core
+	http://www.axonframework.org/schema/axon-core.xsd">
 
-
-
-	<import resource="classpath:query.xml" />
-	<import resource="classpath:application.xml" />
-	<import resource="classpath:domain.xml" />
-	<import resource="classpath:axon.xml" />
-	<import resource="classpath:persistence.xml" />
-	<import resource="classpath:config.xml" />
+	<bean id="cargoDetailQueryService"
+		class="com.github.hippoom.dddsample.cargocqrs.query.CargoDetailQueryService">
+	</bean>
 </beans>
