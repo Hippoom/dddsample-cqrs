@@ -1,4 +1,4 @@
-package com.github.hippoom.dddsample.cargocqrs.application;
+package com.github.hippoom.dddsample.cargocqrs.persistence.jpa;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +11,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import com.github.hippoom.dddsample.cargocqrs.query.CargoDetailQueryService;
+import com.github.hippoom.dddsample.cargocqrs.persistence.CargoDetailDao;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -19,27 +19,26 @@ import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:query.xml",
-		"classpath:persistence.xml", "classpath:config.xml",
-		"classpath:dbdeploy.xml" })
+@ContextConfiguration(locations = { "classpath:persistence.xml",
+		"classpath:config.xml", "classpath:dbdeploy.xml" })
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
 		DirtiesContextTestExecutionListener.class,
 		TransactionalTestExecutionListener.class,
 		DbUnitTestExecutionListener.class })
-public class CargoDetailQueryServicePersistenceTests {
+public class JpaCargoDetailQueryServicePersistenceTests {
 
 	@Autowired
-	private CargoDetailQueryService query;
+	private CargoDetailDao dao;
 
 	@DatabaseSetup(value = "classpath:cargo_detail_rdbms_save_fixture.xml")
 	@ExpectedDatabase(value = "classpath:cargo_detail_rdbms_save_expect.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
 	@Test
 	public void orderInserted() throws Throwable {
-		CargoDto prototype = query.findBy("2");
+		CargoDto prototype = dao.findBy("2");
 
 		CargoDto copy = copy(prototype, "3");
 
-		query.save(copy);
+		dao.save(copy);
 	}
 
 	private CargoDto copy(CargoDto prototype, String copyId) {

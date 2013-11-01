@@ -8,7 +8,6 @@
 
 
 
-	<import resource="classpath:query.xml" />
 	<import resource="classpath:application.xml" />
 	<import resource="classpath:domain.xml" />
 	<import resource="classpath:axon.xml" />

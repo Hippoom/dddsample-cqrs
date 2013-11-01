@@ -12,11 +12,16 @@
 	<bean id="bookingService"
 		class="com.github.hippoom.dddsample.cargocqrs.application.BookingService">
 		<property name="commandGateway" ref="commandGateway" />
+		<property name="cargoDetailQueryService" ref="cargoDetailQueryService" />
 	</bean>
 
 	<bean id="cargoCommandHandler"
 		class="com.github.hippoom.dddsample.cargocqrs.application.CargoCommandHandler">
 		<property name="cargoRepository" ref="cargoRepository" />
 	</bean>
-	
+
+	<bean id="cargoDetailEventHandler"
+		class="com.github.hippoom.dddsample.cargocqrs.query.CargoDetailEventHandler">
+		<property name="cargoDetailDao" ref="cargoDetailQueryService" />
+	</bean>
 </beans>

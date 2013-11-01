@@ -2,6 +2,7 @@ package com.github.hippoom.dddsample.cargocqrs.rest;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,9 +20,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.hippoom.dddsample.cargocqrs.application.BookingService;
+import com.github.hippoom.dddsample.cargocqrs.application.CargoDetailQueryService;
+import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
-import com.github.hippoom.dddsample.cargocqrs.query.CargoDetailQueryService;
 
 @Slf4j
 @Controller
@@ -48,6 +51,25 @@ public class CargoAdminRestEndpoint {
 					"Cannot find cargo by trackingId[" + trackingId + "].");
 		}
 		return cargo;
+	}
+
+	@RequestMapping(value = "/routes/{trackingId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<RouteCandidateDto> requestPossibleRoutesFor(
+			@PathVariable("trackingId") String trackingId) {
+		final List<Itinerary> itineraries = bookingService
+				.requestPossibleRoutesForCargo(TrackingId.of(trackingId));
+		if (CollectionUtils.isEmpty(itineraries)) {
+			throw new ResourceNotFoundException(
+					"Cannot find route candidates for cargo with trackingId["
+							+ trackingId + "].");
+		}
+		return to(itineraries);
+	}
+
+	private List<RouteCandidateDto> to(List<Itinerary> itineraries) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)

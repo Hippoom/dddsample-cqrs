@@ -9,4 +9,12 @@
 
 	<context:property-placeholder location="classpath:runtime.properties" />
 
+	<bean id="configurations"
+		class="com.github.hippoom.dddsample.cargocqrs.config.Configurations">
+		<property name="pathfinderSchema" value="${runtime.pathfinder.schema}" />
+		<property name="pathfinderHost" value="${runtime.pathfinder.host}" />
+		<property name="pathfinderPort" value="${runtime.pathfinder.port}" />
+		<property name="pathfinderContextPath" value="${runtime.pathfinder.contextPath}" />
+		<property name="pathfinderRoutesPath" value="${runtime.pathfinder.routes.path}" />
+	</bean>
 </beans>
