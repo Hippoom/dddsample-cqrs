@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class RouteCandidateDto {
 
-	private List<LegDTO> legs;
+	private List<LegDto> legs;
 
 	/**
 	 * Constructor.
@@ -19,7 +19,7 @@ public class RouteCandidateDto {
 	 * @param legs
 	 *            The legs for this itinerary.
 	 */
-	public RouteCandidateDto(final List<LegDTO> legs) {
+	public RouteCandidateDto(final List<LegDto> legs) {
 		this.legs = legs;
 	}
 

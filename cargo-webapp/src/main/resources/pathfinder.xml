@@ -30,22 +30,9 @@
 		url-expression="'#{configurations.getPathFInderRoutesUrl()}' + '?spec={spec}'"
 		http-method="GET" message-converters="stringHttpMessageConverter"
 		expected-response-type="java.lang.String" request-channel="fetchRoutesFromPathFindInputChannel"
-		reply-channel="translateTransitPathStringToObjectInputChannel">
+		reply-channel="translateItinerariesInputChannel">
 		<int-http:uri-variable name="spec" expression="payload" />
 	</int-http:outbound-gateway>
-
-	<int:channel id="translateItinerariesInputChannel" />
-	<int:chain id="ItinerariesTranslator" input-channel="translateItinerariesInputChannel"
-		output-channel="fetchRoutesForSpecificationOutputChannel">
-		<int:transformer>
-			<bean
-				class="com.github.hippoom.dddsample.cargocqrs.pathfinder.TransitPathTranslator" />
-		</int:transformer>
-		<int:transformer>
-			<bean
-				class="com.github.hippoom.dddsample.cargocqrs.pathfinder.ItineraryTranslator" />
-		</int:transformer>
-	</int:chain>
 
 	<bean id="stringHttpMessageConverter"
 		class="org.springframework.http.converter.StringHttpMessageConverter">

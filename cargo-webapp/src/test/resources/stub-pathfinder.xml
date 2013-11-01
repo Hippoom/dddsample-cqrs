@@ -20,7 +20,7 @@
 		</int-groovy:script>
 	</int:service-activator>
 	
-	<int:channel id="translateTransitPathStringToObjectInputChannel">
+	<int:channel id="translateItinerariesInputChannel">
 		<int:queue />
 	</int:channel>
 </beans>

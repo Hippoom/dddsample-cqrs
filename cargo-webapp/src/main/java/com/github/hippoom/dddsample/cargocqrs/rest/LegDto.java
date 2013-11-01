@@ -8,7 +8,7 @@ import lombok.Data;
  * DTO for a leg in an itinerary.
  */
 @Data
-public class LegDTO {
+public class LegDto {
 
 	private String voyageNumber;
 	private String from;
@@ -25,7 +25,7 @@ public class LegDTO {
 	 * @param loadTime
 	 * @param unloadTime
 	 */
-	public LegDTO(final String voyageNumber, final String from,
+	public LegDto(final String voyageNumber, final String from,
 			final String to, Date loadTime, Date unloadTime) {
 		this.voyageNumber = voyageNumber;
 		this.from = from;
@@ -37,7 +37,7 @@ public class LegDTO {
 	/**
 	 * frameworks only
 	 */
-	private LegDTO() {
+	private LegDto() {
 	}
 
 }

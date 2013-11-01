@@ -42,7 +42,7 @@ public class PathFinderRestClientIntegrationTests {
 	@Resource(name = "fetchRoutesForSpecificationInputChannel")
 	private MessageChannel in;
 
-	@Resource(name = "translateTransitPathStringToObjectInputChannel")
+	@Resource(name = "translateItinerariesInputChannel")
 	private PollableChannel out;
 
 	@Test

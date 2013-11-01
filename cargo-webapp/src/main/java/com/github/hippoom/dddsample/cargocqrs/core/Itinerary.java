@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 /**
@@ -13,7 +14,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class Itinerary {
-
+	@Getter
 	private List<Leg> legs = new ArrayList<Leg>();
 
 	public Itinerary(Leg leg) {

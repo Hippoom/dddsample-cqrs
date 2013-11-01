@@ -23,7 +23,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
 import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:config.xml", "classpath:pathfinder.xml",
+@ContextConfiguration({ "classpath:config.xml", "classpath:pathfinder-translator.xml",
 		"classpath:stub-itinerary-translator.xml" })
 public class ItineraryTranslatorIntegrationTests {
 

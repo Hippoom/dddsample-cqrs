@@ -13,6 +13,7 @@
 		class="com.github.hippoom.dddsample.cargocqrs.application.BookingService">
 		<property name="commandGateway" ref="commandGateway" />
 		<property name="cargoDetailQueryService" ref="cargoDetailQueryService" />
+		<property name="routingService" ref="routingService" />
 	</bean>
 
 	<bean id="cargoCommandHandler"

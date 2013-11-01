@@ -1,6 +1,7 @@
 package com.github.hippoom.dddsample.cargocqrs.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.github.hippoom.dddsample.cargocqrs.application.BookingService;
 import com.github.hippoom.dddsample.cargocqrs.application.CargoDetailQueryService;
 import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
+import com.github.hippoom.dddsample.cargocqrs.core.Leg;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
 
@@ -59,6 +61,7 @@ public class CargoAdminRestEndpoint {
 			@PathVariable("trackingId") String trackingId) {
 		final List<Itinerary> itineraries = bookingService
 				.requestPossibleRoutesForCargo(TrackingId.of(trackingId));
+
 		if (CollectionUtils.isEmpty(itineraries)) {
 			throw new ResourceNotFoundException(
 					"Cannot find route candidates for cargo with trackingId["
@@ -67,9 +70,20 @@ public class CargoAdminRestEndpoint {
 		return to(itineraries);
 	}
 
+	// TODO refactor this to a mapper
 	private List<RouteCandidateDto> to(List<Itinerary> itineraries) {
-		// TODO Auto-generated method stub
-		return null;
+		final List<RouteCandidateDto> routes = new ArrayList<RouteCandidateDto>();
+		for (Itinerary itinerary : itineraries) {
+			final List<LegDto> legs = new ArrayList<LegDto>();
+			for (Leg leg : itinerary.getLegs()) {
+				legs.add(new LegDto(leg.getVoyageNumber().getNumber(), leg
+						.getLoadLocation().getUnlocode(), leg
+						.getUnloadLocation().getUnlocode(), leg.getLoadTime(),
+						leg.getUnloadTime()));
+			}
+			routes.add(new RouteCandidateDto(legs));
+		}
+		return routes;
 	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)

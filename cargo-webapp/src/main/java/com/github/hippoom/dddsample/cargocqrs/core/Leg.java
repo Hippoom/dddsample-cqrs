@@ -3,6 +3,7 @@ package com.github.hippoom.dddsample.cargocqrs.core;
 import java.util.Date;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 import org.apache.commons.lang.Validate;
@@ -12,9 +13,10 @@ import org.apache.commons.lang.Validate;
  */
 @EqualsAndHashCode
 @ToString
+@Getter
 public class Leg {
 
-	private VoyageNumber voyage;
+	private VoyageNumber voyageNumber;
 	private UnLocode loadLocation;
 	private UnLocode unloadLocation;
 	private Date loadTime;
@@ -25,7 +27,7 @@ public class Leg {
 		Validate.noNullElements(new Object[] { voyage, loadLocation,
 				unloadLocation, loadTime, unloadTime });
 
-		this.voyage = voyage;
+		this.voyageNumber = voyage;
 		this.loadLocation = loadLocation;
 		this.unloadLocation = unloadLocation;
 		this.loadTime = loadTime;

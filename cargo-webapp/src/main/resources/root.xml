@@ -13,4 +13,7 @@
 	<import resource="classpath:axon.xml" />
 	<import resource="classpath:persistence.xml" />
 	<import resource="classpath:config.xml" />
+	<import resource="classpath:pathfinder.xml" />
+	<import resource="classpath:pathfinder-channels.xml" />
+	<import resource="classpath:pathfinder-translator.xml" />
 </beans>

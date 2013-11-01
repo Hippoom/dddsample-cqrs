@@ -2,7 +2,9 @@ package com.github.hippoom.dddsample.cargocqrs.acceptance;
 
 import static com.github.dreamhead.moco.Moco.and;
 import static com.github.dreamhead.moco.Moco.by;
+import static com.github.dreamhead.moco.Moco.eq;
 import static com.github.dreamhead.moco.Moco.httpserver;
+import static com.github.dreamhead.moco.Moco.query;
 import static com.github.dreamhead.moco.Moco.uri;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -113,8 +115,9 @@ public class CargoAdminSteps implements ApplicationContextAware {
 
 		HttpServer server = httpserver(10001);
 		server.get(
-				and(by(uri("/pathfinder/shortestPath/")),
-						by(json("classpath:acceptance_route_specification.json"))))
+				and(by(uri("/pathfinder/shortestPath")),
+						eq(query("spec"),
+								json("classpath:acceptance_route_specification.json"))))
 				.response(json("classpath:acceptance_pathfinder_stub.json"));
 
 		moco = new MocoHttpServer((ActualHttpServer) server);
