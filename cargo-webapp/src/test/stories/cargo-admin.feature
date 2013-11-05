@@ -8,6 +8,7 @@ Scenario: Customer registers a new cargo
 
 When I fill the form with origin, destination and arrival deadline
 Then a new cargo is registered
+And the cargo is not routed
 And the tracking id is shown for following steps
 
 Scenario: Customer assigns the cargo to route

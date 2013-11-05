@@ -21,10 +21,12 @@ public class Cargo extends AbstractAnnotatedAggregateRoot<TrackingId> {
 
 	public Cargo(TrackingId trackingId, UnLocode originUnLocode,
 			UnLocode destinationUnLocode, Date arrivalDeadline) {
-
+		Delivery delivery = Delivery.derivedFrom(new RouteSpecification(
+				originUnLocode, destinationUnLocode, arrivalDeadline));
 		apply(new CargoRegisteredEvent(trackingId.getValue(),
 				originUnLocode.getUnlocode(),
-				destinationUnLocode.getUnlocode(), arrivalDeadline));
+				destinationUnLocode.getUnlocode(), arrivalDeadline,
+				delivery.routingStatus()));
 	}
 
 	/**

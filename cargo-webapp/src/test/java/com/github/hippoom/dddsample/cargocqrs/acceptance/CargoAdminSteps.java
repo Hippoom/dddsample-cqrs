@@ -6,6 +6,7 @@ import static com.github.dreamhead.moco.Moco.eq;
 import static com.github.dreamhead.moco.Moco.httpserver;
 import static com.github.dreamhead.moco.Moco.query;
 import static com.github.dreamhead.moco.Moco.uri;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dreamhead.moco.HttpServer;
 import com.github.dreamhead.moco.internal.ActualHttpServer;
 import com.github.dreamhead.moco.internal.MocoHttpServer;
+import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
@@ -99,7 +101,14 @@ public class CargoAdminSteps implements ApplicationContextAware {
 
 	@Then("^a new cargo is registered$")
 	public void a_new_cargo_is_registered() throws Throwable {
+		this.cargo = findCargoBy(this.trackingId);
+		assertThat(cargo, not(nullValue()));
+	}
 
+	@Then("^the cargo is not routed$")
+	public void the_cargo_is_not_routed() throws Throwable {
+		assertThat(cargo.getRoutingStatus(),
+				equalTo(RoutingStatus.NOT_ROUTED.getCode()));
 	}
 
 	@Then("^the tracking id is shown for following steps$")
@@ -160,13 +169,17 @@ public class CargoAdminSteps implements ApplicationContextAware {
 
 	@Then("^the cargo is assigned to the route$")
 	public void the_cargo_is_assigned_to_the_route() throws Throwable {
+		this.cargo = findCargoBy(this.trackingId);
+		throw new PendingException();
+	}
+
+	private CargoDto findCargoBy(String trackingId) throws Exception {
 		final MvcResult result = mockMvc()
 				.perform(get("/cargo/" + this.trackingId)).andDo(print())
 				.andExpect(status().isOk()).andReturn();
 
-		this.cargo = new ObjectMapper().readValue(result.getResponse()
+		return new ObjectMapper().readValue(result.getResponse()
 				.getContentAsByteArray(), CargoDto.class);
-		throw new PendingException();
 	}
 
 	@Override

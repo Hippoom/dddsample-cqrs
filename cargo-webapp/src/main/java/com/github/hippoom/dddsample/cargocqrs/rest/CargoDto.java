@@ -21,6 +21,7 @@ import lombok.ToString;
 @EqualsAndHashCode(of = "trackingId")
 @ToString
 public class CargoDto {
+
 	@Id
 	@Column(name = "tracking_id")
 	private String trackingId;
@@ -34,4 +35,7 @@ public class CargoDto {
 	@Temporal(value = TemporalType.DATE)
 	@Column(name = "arrival_deadline")
 	private Date arrivalDeadline;
+
+	@Column(name = "routing_status")
+	private String routingStatus;
 }

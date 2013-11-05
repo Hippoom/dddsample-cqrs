@@ -25,11 +25,13 @@ import com.github.hippoom.dddsample.cargocqrs.core.Cargo;
 import com.github.hippoom.dddsample.cargocqrs.core.CargoRepository;
 import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
 import com.github.hippoom.dddsample.cargocqrs.core.Leg;
+import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
 import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
+import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
@@ -85,7 +87,8 @@ public class CargoCommandHandlerUnitTests {
 						new CargoRegisteredEvent(trackingId.getValue(),
 								originUnLocode.getUnlocode(),
 								destinationUnLocode.getUnlocode(),
-								arrivalDeadline)).expectReturnValue(trackingId);
+								arrivalDeadline, RoutingStatus.NOT_ROUTED))
+				.expectReturnValue(trackingId);
 
 	}
 
@@ -105,7 +108,8 @@ public class CargoCommandHandlerUnitTests {
 		fixture.given(
 				new CargoRegisteredEvent(trackingId.getValue(), sha
 						.getUnlocode(), pek.getUnlocode(), new DateTime()
-						.withDate(2015, 4, 8).toDate()))
+						.withDate(2015, 4, 8).toDate(),
+						RoutingStatus.NOT_ROUTED))
 				.when(new AssignCargoToRouteCommand(trackingId, itinerary))
 				.expectEvents(
 						new CargoAssignedEvent(trackingId.getValue(),
@@ -133,7 +137,8 @@ public class CargoCommandHandlerUnitTests {
 		fixture.given(
 				new CargoRegisteredEvent(trackingId.getValue(), sha
 						.getUnlocode(), pek.getUnlocode(), new DateTime()
-						.withDate(2015, 4, 6).withTimeAtStartOfDay().toDate()))
+						.withDate(2015, 4, 6).withTimeAtStartOfDay().toDate(),
+						RoutingStatus.NOT_ROUTED))
 				.when(new AssignCargoToRouteCommand(trackingId, itinerary))
 				.expectException(CannotAssignCargoToRouteException.class)
 				.expectException(

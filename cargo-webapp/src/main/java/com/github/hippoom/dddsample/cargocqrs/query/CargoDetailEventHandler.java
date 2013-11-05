@@ -1,6 +1,5 @@
 package com.github.hippoom.dddsample.cargocqrs.query;
 
-
 import lombok.Setter;
 
 import org.axonframework.eventhandling.annotation.EventHandler;
@@ -24,6 +23,7 @@ public class CargoDetailEventHandler {
 		cargo.setOriginUnlocode(event.getOriginUnlocode());
 		cargo.setDestinationUnlocode(event.getDestinationUnlocode());
 		cargo.setArrivalDeadline(event.getArrivalDeadline());
+		cargo.setRoutingStatus(event.getRoutingStatus());
 		return cargo;
 	}
 }
