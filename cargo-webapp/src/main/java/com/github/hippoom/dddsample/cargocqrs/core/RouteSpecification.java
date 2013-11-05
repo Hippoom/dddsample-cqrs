@@ -43,4 +43,16 @@ public class RouteSpecification {
 		this.arrivalDeadline = (Date) arrivalDeadline.clone();
 	}
 
+	/**
+	 * 
+	 * @param itinerary
+	 * @return
+	 */
+	public boolean isSatisfiedBy(final Itinerary itinerary) {
+		return itinerary != null
+				&& origin.equals(itinerary.initialDepartureLocation())
+				&& destination.equals(itinerary.finalArrivalLocation())
+				&& arrivalDeadline.after(itinerary.finalArrivalDate());
+	}
+
 }

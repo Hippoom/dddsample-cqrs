@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,6 +34,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -141,8 +143,19 @@ public class CargoAdminSteps implements ApplicationContextAware {
 
 	@When("^I pick up a candidate$")
 	public void I_pick_up_a_candidate() throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
+		mockMvc()
+				.perform(
+						post("/cargo/" + this.trackingId).content(
+								json(routeCandidates.get(0))).contentType(
+								MediaType.APPLICATION_JSON)).andDo(print())
+				.andExpect(status().isOk());
+
+	}
+
+	private byte[] json(RouteCandidateDto routeCandidateDto)
+			throws JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.writeValueAsBytes(routeCandidateDto);
 	}
 
 	@Then("^the cargo is assigned to the route$")

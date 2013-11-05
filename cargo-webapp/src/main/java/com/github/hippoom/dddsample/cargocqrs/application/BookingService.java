@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Setter;
 
 import com.github.hippoom.dddsample.cargocqrs.axon.GenericCommandGateway;
+import com.github.hippoom.dddsample.cargocqrs.command.AssignCargoToRouteCommand;
 import com.github.hippoom.dddsample.cargocqrs.command.RegisterCargoCommand;
 import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
 import com.github.hippoom.dddsample.cargocqrs.core.RouteSpecification;
@@ -57,5 +58,16 @@ public class BookingService {
 		return new RouteSpecification(new UnLocode(cargo.getOriginUnlocode()),
 				new UnLocode(cargo.getDestinationUnlocode()),
 				cargo.getArrivalDeadline());
+	}
+
+	/**
+	 * @param itinerary
+	 *            itinerary describing the selected route
+	 * @param trackingId
+	 *            cargo tracking id
+	 */
+	public void assignCargoToRoute(TrackingId trackingId, Itinerary itinerary) {
+		commandGateway.sendAndWait(new AssignCargoToRouteCommand(trackingId,
+				itinerary));
 	}
 }

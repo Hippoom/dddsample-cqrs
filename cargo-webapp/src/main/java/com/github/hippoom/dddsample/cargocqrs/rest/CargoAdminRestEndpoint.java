@@ -26,6 +26,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
 import com.github.hippoom.dddsample.cargocqrs.core.Leg;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
+import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 
 @Slf4j
 @Controller
@@ -68,6 +69,23 @@ public class CargoAdminRestEndpoint {
 							+ trackingId + "].");
 		}
 		return to(itineraries);
+	}
+
+	@RequestMapping(value = "/cargo/{trackingId}", method = RequestMethod.POST)
+	public void assignCargoToRoute(
+			@PathVariable("trackingId") String trackingId,
+			@RequestBody RouteCandidateDto route) {
+		bookingService.assignCargoToRoute(TrackingId.of(trackingId), to(route));
+	}
+
+	private Itinerary to(RouteCandidateDto route) {
+		final List<Leg> legs = new ArrayList<Leg>();
+		for (LegDto leg : route.getLegs()) {
+			legs.add(new Leg(new VoyageNumber(leg.getVoyageNumber()),
+					new UnLocode(leg.getFrom()), new UnLocode(leg.getTo()), leg
+							.getLoadTime(), leg.getUnloadTime()));
+		}
+		return new Itinerary(legs);
 	}
 
 	// TODO refactor this to a mapper
