@@ -48,7 +48,8 @@ public class CargoAdminRestEndpoint {
 	@RequestMapping(value = "/cargo/{trackingId}", method = RequestMethod.GET)
 	@ResponseBody
 	public CargoDto findCargoBy(@PathVariable("trackingId") String trackingId) {
-		final CargoDto cargo = cargoDetailQueryService.findBy(trackingId);
+		final CargoDto cargo = cargoDetailQueryService
+				.findWithLegsBy(trackingId);
 		if (cargo == null) {
 			throw new ResourceNotFoundException(
 					"Cannot find cargo by trackingId[" + trackingId + "].");
@@ -75,6 +76,9 @@ public class CargoAdminRestEndpoint {
 	public void assignCargoToRoute(
 			@PathVariable("trackingId") String trackingId,
 			@RequestBody RouteCandidateDto route) {
+
+		System.err.println(route);
+
 		bookingService.assignCargoToRoute(TrackingId.of(trackingId), to(route));
 	}
 
@@ -93,8 +97,9 @@ public class CargoAdminRestEndpoint {
 		final List<RouteCandidateDto> routes = new ArrayList<RouteCandidateDto>();
 		for (Itinerary itinerary : itineraries) {
 			final List<LegDto> legs = new ArrayList<LegDto>();
+			int i = 0;
 			for (Leg leg : itinerary.getLegs()) {
-				legs.add(new LegDto(leg.getVoyageNumber().getNumber(), leg
+				legs.add(new LegDto(i++, leg.getVoyageNumber().getNumber(), leg
 						.getLoadLocation().getUnlocode(), leg
 						.getUnloadLocation().getUnlocode(), leg.getLoadTime(),
 						leg.getUnloadTime()));

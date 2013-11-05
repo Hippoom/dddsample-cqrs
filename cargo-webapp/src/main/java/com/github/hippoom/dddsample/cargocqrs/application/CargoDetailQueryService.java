@@ -6,4 +6,5 @@ public interface CargoDetailQueryService {
 
 	CargoDto findBy(String trackingId);
 
+	CargoDto findWithLegsBy(String trackingId);
 }

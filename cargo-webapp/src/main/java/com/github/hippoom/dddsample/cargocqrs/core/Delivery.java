@@ -10,9 +10,10 @@ import org.apache.commons.lang.Validate;
  * 
  */
 public class Delivery {
+	private static final Date ETA_UNKOWN = null;
 
 	private RoutingStatus routingStatus;
-	private Date calculatedAt;
+	private Date eta;
 
 	/**
 	 * Creates a new delivery snapshot based on the complete handling history of
@@ -22,8 +23,23 @@ public class Delivery {
 	 *            route specification
 	 */
 	static Delivery derivedFrom(RouteSpecification routeSpecification) {
-		Validate.notNull(routeSpecification, "Route specification is required");
 		return new Delivery(routeSpecification);
+	}
+
+	/**
+	 * Creates a new delivery snapshot to reflect changes in routing, i.e. when
+	 * the route specification or the itinerary has changed but no additional
+	 * handling of the cargo has been performed.
+	 * 
+	 * @param routeSpecification
+	 *            route specification
+	 * @param itinerary
+	 *            itinerary
+	 * @return An up to date delivery
+	 */
+	static Delivery derivedFrom(RouteSpecification routeSpecification,
+			Itinerary itinerary) {
+		return new Delivery(itinerary, routeSpecification);
 	}
 
 	/**
@@ -37,16 +53,42 @@ public class Delivery {
 	 *            route specification
 	 */
 	private Delivery(RouteSpecification routeSpecification) {
-		this.calculatedAt = new Date();
-		this.routingStatus = calculateRoutingStatus(routeSpecification);
+		this(null, routeSpecification);
 	}
 
-	public RoutingStatus calculateRoutingStatus(
+	public Delivery(Itinerary itinerary, RouteSpecification routeSpecification) {
+		Validate.notNull(routeSpecification, "Route specification is required");
+		this.routingStatus = calculateRoutingStatus(itinerary,
+				routeSpecification);
+		this.eta = calculateEta(itinerary);
+	}
+
+	private RoutingStatus calculateRoutingStatus(Itinerary itinerary,
 			RouteSpecification routeSpecification) {
-		return RoutingStatus.NOT_ROUTED;
+		if (itinerary == null) {
+			return RoutingStatus.NOT_ROUTED;
+		} else {
+			return RoutingStatus.ROUTED;
+		}
+	}
+
+	private Date calculateEta(Itinerary itinerary) {
+		if (onTrack()) {
+			return itinerary.finalArrivalDate();
+		} else {
+			return ETA_UNKOWN;
+		}
+	}
+
+	private boolean onTrack() {
+		return routingStatus.equals(RoutingStatus.ROUTED);
 	}
 
 	public RoutingStatus routingStatus() {
 		return routingStatus;
+	}
+
+	public Date eta() {
+		return eta;
 	}
 }

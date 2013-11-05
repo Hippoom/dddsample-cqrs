@@ -9,6 +9,7 @@ import org.axonframework.eventsourcing.annotation.AbstractAnnotatedAggregateRoot
 import org.axonframework.eventsourcing.annotation.AggregateIdentifier;
 
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
 
 @SuppressWarnings("serial")
@@ -37,7 +38,11 @@ public class Cargo extends AbstractAnnotatedAggregateRoot<TrackingId> {
 	 */
 	public void assignToRoute(final Itinerary itinerary) {
 		if (routeSpecification.isSatisfiedBy(itinerary)) {
-			apply(new CargoAssignedEvent(this.trackingId, itinerary));
+			Delivery delivery = Delivery.derivedFrom(routeSpecification,
+					itinerary);
+			apply(new CargoAssignedEvent(this.trackingId, itinerary,
+					delivery.routingStatus()));
+			apply(new CargoEtaCalculatedEvent(this.trackingId, delivery.eta()));
 		} else {
 			throw new CannotAssignCargoToRouteException(this.trackingId,
 					this.routeSpecification, itinerary);

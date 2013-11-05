@@ -20,8 +20,15 @@ public class JpaCargoDetailDao implements CargoDetailDao {
 	}
 
 	@Override
+	public CargoDto findWithLegsBy(String trackingId) {
+		CargoDto cargo = findBy(trackingId);
+		cargo.getLegs().size();
+		return cargo;
+	}
+
+	@Override
 	@Transactional
-	public void save(CargoDto cargo) {
+	public void store(CargoDto cargo) {
 		entityManager.persist(cargo);
 	}
 

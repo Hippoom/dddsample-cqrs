@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -44,9 +45,9 @@ import com.github.dreamhead.moco.internal.ActualHttpServer;
 import com.github.dreamhead.moco.internal.MocoHttpServer;
 import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
+import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -170,7 +171,21 @@ public class CargoAdminSteps implements ApplicationContextAware {
 	@Then("^the cargo is assigned to the route$")
 	public void the_cargo_is_assigned_to_the_route() throws Throwable {
 		this.cargo = findCargoBy(this.trackingId);
-		throw new PendingException();
+		assertThat(cargo.getLegs(), equalTo(routeCandidates.get(0).getLegs()));
+	}
+
+	@Then("^the cargo is routed$")
+	public void the_cargo_is_routed() throws Throwable {
+		assertThat(cargo.getRoutingStatus(),
+				equalTo(RoutingStatus.ROUTED.getCode()));
+	}
+
+	@Then("^the estimated time of arrival equals to the last unloaded time of the route$")
+	public void the_estimated_time_of_arrival_equals_to_the_last_unloaded_time_of_the_route()
+			throws Throwable {
+		List<LegDto> legs = routeCandidates.get(0).getLegs();
+		assertThat(cargo.getEta(), equalTo(legs.get(legs.size() - 1)
+				.getUnloadTime()));
 	}
 
 	private CargoDto findCargoBy(String trackingId) throws Exception {
@@ -178,7 +193,9 @@ public class CargoAdminSteps implements ApplicationContextAware {
 				.perform(get("/cargo/" + this.trackingId)).andDo(print())
 				.andExpect(status().isOk()).andReturn();
 
-		return new ObjectMapper().readValue(result.getResponse()
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+		return objectMapper.readValue(result.getResponse()
 				.getContentAsByteArray(), CargoDto.class);
 	}
 

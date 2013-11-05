@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
 import com.github.hippoom.dddsample.cargocqrs.core.Leg;
+import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
@@ -15,21 +16,27 @@ import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 public class CargoAssignedEvent {
 	private final String trackingId;
 	private final RouteCandidateDto route;
+	private final String routingStatus;
 
-	public CargoAssignedEvent(String trackingId, RouteCandidateDto route) {
-		this.trackingId = trackingId;
-		this.route = route;
-	}
-
-	public CargoAssignedEvent(TrackingId trackingId, Itinerary itinerary) {
+	public CargoAssignedEvent(TrackingId trackingId, Itinerary itinerary,
+			RoutingStatus routingStatus) {
 		this.trackingId = trackingId.getValue();
 		this.route = toRoute(itinerary);
+		this.routingStatus = routingStatus.getCode();
+	}
+
+	public CargoAssignedEvent(String trackingId, RouteCandidateDto route,
+			String routingStatus) {
+		this.trackingId = trackingId;
+		this.route = route;
+		this.routingStatus = routingStatus;
 	}
 
 	private RouteCandidateDto toRoute(Itinerary itinerary) {
 		final List<LegDto> legs = new ArrayList<LegDto>();
+		int i = 0;
 		for (Leg leg : itinerary.getLegs()) {
-			legs.add(new LegDto(leg.getVoyageNumber().getNumber(), leg
+			legs.add(new LegDto(i++, leg.getVoyageNumber().getNumber(), leg
 					.getLoadLocation().getUnlocode(), leg.getUnloadLocation()
 					.getUnlocode(), leg.getLoadTime(), leg.getUnloadTime()));
 		}

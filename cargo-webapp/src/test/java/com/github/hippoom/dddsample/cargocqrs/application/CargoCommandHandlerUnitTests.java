@@ -1,7 +1,7 @@
 package com.github.hippoom.dddsample.cargocqrs.application;
 
-import static org.junit.internal.matchers.ThrowableMessageMatcher.*;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -30,8 +30,8 @@ import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
 import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
-import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
@@ -114,8 +114,10 @@ public class CargoCommandHandlerUnitTests {
 				.expectEvents(
 						new CargoAssignedEvent(trackingId.getValue(),
 								new RouteCandidateDto(Arrays.asList(new LegDto(
-										"CM001", "CNSHA", "CNPEK", loadTime,
-										unloadTime)))));
+										0, "CM001", "CNSHA", "CNPEK", loadTime,
+										unloadTime))),
+								RoutingStatus.ROUTED.getCode()),
+						new CargoEtaCalculatedEvent(trackingId, unloadTime));
 
 	}
 

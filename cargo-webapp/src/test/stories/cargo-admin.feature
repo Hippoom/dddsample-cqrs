@@ -18,3 +18,5 @@ And I request possible routes for the cargo
 And some routes are shown
 When I pick up a candidate
 Then the cargo is assigned to the route
+And the cargo is routed
+And the estimated time of arrival equals to the last unloaded time of the route 

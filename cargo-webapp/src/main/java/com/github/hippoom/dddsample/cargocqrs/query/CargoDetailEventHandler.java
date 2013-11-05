@@ -4,6 +4,8 @@ import lombok.Setter;
 
 import org.axonframework.eventhandling.annotation.EventHandler;
 
+import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
 import com.github.hippoom.dddsample.cargocqrs.persistence.CargoDetailDao;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
@@ -14,7 +16,22 @@ public class CargoDetailEventHandler {
 
 	@EventHandler
 	public void on(CargoRegisteredEvent event) {
-		cargoDetailDao.save(from(event));
+		cargoDetailDao.store(from(event));
+	}
+
+	@EventHandler
+	public void on(CargoAssignedEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setRoutingStatus(event.getRoutingStatus());
+		cargo.setLegs(event.getRoute().getLegs());
+		cargoDetailDao.store(cargo);
+	}
+
+	@EventHandler
+	public void on(CargoEtaCalculatedEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setEta(event.getEta());
+		cargoDetailDao.store(cargo);
 	}
 
 	private CargoDto from(CargoRegisteredEvent event) {

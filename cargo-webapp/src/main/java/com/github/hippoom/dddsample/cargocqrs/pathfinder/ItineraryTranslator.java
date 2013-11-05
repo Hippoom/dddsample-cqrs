@@ -3,9 +3,6 @@ package com.github.hippoom.dddsample.cargocqrs.pathfinder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
 import com.github.hippoom.dddsample.cargocqrs.core.Leg;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
