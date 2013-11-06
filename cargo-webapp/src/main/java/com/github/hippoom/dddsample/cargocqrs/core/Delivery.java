@@ -14,6 +14,7 @@ public class Delivery {
 
 	private RoutingStatus routingStatus;
 	private Date eta;
+	private HandlingActivity nextExpectedHandlingActivity;
 
 	/**
 	 * Creates a new delivery snapshot based on the complete handling history of
@@ -61,6 +62,14 @@ public class Delivery {
 		this.routingStatus = calculateRoutingStatus(itinerary,
 				routeSpecification);
 		this.eta = calculateEta(itinerary);
+		this.nextExpectedHandlingActivity = calculateNextExpectedActivity(
+				routeSpecification, itinerary);
+	}
+
+	private HandlingActivity calculateNextExpectedActivity(
+			RouteSpecification routeSpecification, Itinerary itinerary) {
+		return new HandlingActivity(HandlingType.RECEIVE,
+				routeSpecification.getOrigin());
 	}
 
 	private RoutingStatus calculateRoutingStatus(Itinerary itinerary,
@@ -82,6 +91,10 @@ public class Delivery {
 
 	private boolean onTrack() {
 		return routingStatus.equals(RoutingStatus.ROUTED);
+	}
+
+	public HandlingActivity nextExpectedHandlingActivity() {
+		return nextExpectedHandlingActivity;
 	}
 
 	public RoutingStatus routingStatus() {

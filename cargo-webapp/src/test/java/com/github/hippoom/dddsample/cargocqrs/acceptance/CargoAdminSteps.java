@@ -43,11 +43,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dreamhead.moco.HttpServer;
 import com.github.dreamhead.moco.internal.ActualHttpServer;
 import com.github.dreamhead.moco.internal.MocoHttpServer;
+import com.github.hippoom.dddsample.cargocqrs.core.HandlingType;
 import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
+import com.github.hippoom.dddsample.cargocqrs.core.TransportStatus;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -186,6 +189,22 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		List<LegDto> legs = routeCandidates.get(0).getLegs();
 		assertThat(cargo.getEta(), equalTo(legs.get(legs.size() - 1)
 				.getUnloadTime()));
+	}
+
+	@Then("^the transport status of the cargo is NOT_RECEIVED$")
+	public void the_transport_status_of_the_cargo_is_NOT_RECEIVED()
+			throws Throwable {
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.NOT_RECEIVED.getCode()));
+	}
+
+	@Then("^the next expected handling activity is being received at the origin of the route specification$")
+	public void the_next_expected_handling_activity_is_being_received_at_the_origin_of_the_route_specification()
+			throws Throwable {
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.RECEIVE.getCode()));
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getOriginUnlocode()));
 	}
 
 	private CargoDto findCargoBy(String trackingId) throws Exception {

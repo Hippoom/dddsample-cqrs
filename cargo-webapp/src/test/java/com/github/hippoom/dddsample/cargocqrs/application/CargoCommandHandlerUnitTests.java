@@ -23,6 +23,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.AggregateIdentifierGenerator;
 import com.github.hippoom.dddsample.cargocqrs.core.CannotAssignCargoToRouteException;
 import com.github.hippoom.dddsample.cargocqrs.core.Cargo;
 import com.github.hippoom.dddsample.cargocqrs.core.CargoRepository;
+import com.github.hippoom.dddsample.cargocqrs.core.HandlingType;
 import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
 import com.github.hippoom.dddsample.cargocqrs.core.Leg;
 import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
@@ -32,6 +33,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.NextExpectedHandlingActivityCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
@@ -117,7 +119,9 @@ public class CargoCommandHandlerUnitTests {
 										0, "CM001", "CNSHA", "CNPEK", loadTime,
 										unloadTime))),
 								RoutingStatus.ROUTED.getCode()),
-						new CargoEtaCalculatedEvent(trackingId, unloadTime));
+						new CargoEtaCalculatedEvent(trackingId, unloadTime),
+						new NextExpectedHandlingActivityCalculatedEvent(
+								trackingId, HandlingType.RECEIVE, null, sha));
 
 	}
 
