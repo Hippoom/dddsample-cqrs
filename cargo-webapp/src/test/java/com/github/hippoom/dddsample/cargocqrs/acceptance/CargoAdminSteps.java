@@ -48,6 +48,7 @@ import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -197,6 +198,61 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
 		return objectMapper.readValue(result.getResponse()
 				.getContentAsByteArray(), CargoDto.class);
+	}
+
+	@Then("^the transporting status of the cargo is NOT_RECEIVED$")
+	public void the_transporting_status_of_the_cargo_is_NOT_RECEIVED()
+			throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Then("^the next expected handling activity is being received at the origin of the route specification$")
+	public void the_next_expected_handling_activity_is_being_received_at_the_origin_of_the_route_specification()
+			throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Given("^a cargo has been routed$")
+	public void a_cargo_has_been_routed() throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@When("^I register a new handling event of which type is load$")
+	public void I_register_a_new_handling_event_of_which_type_is_load()
+			throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Then("^the transporting status of the cargo is ONBOARD_CARRIER$")
+	public void the_transporting_status_of_the_cargo_is_ONBOARD_CARRIER()
+			throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Then("^the last known location of the cargo is updated as the location of the handling event$")
+	public void the_last_known_location_of_the_cargo_is_updated_as_the_location_of_the_handling_event()
+			throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Then("^the current voyage of the cargo is updated as the voyage of the handling event$")
+	public void the_current_voyage_of_the_cargo_is_updated_as_the_voyage_of_the_handling_event()
+			throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
+	}
+
+	@Then("^the next expected handling activity is being shipped by the leg's voyage and unloading$")
+	public void the_next_expected_handling_activity_is_being_shipped_by_the_leg_s_voyage_and_unloading()
+			throws Throwable {
+		// Express the Regexp above with the code you wish you had
+		throw new PendingException();
 	}
 
 	@Override

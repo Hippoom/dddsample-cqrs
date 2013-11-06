@@ -20,3 +20,5 @@ When I pick up a candidate
 Then the cargo is assigned to the route
 And the cargo is routed
 And the estimated time of arrival equals to the last unloaded time of the route 
+Then the transporting status of the cargo is NOT_RECEIVED
+And the next expected handling activity is being received at the origin of the route specification
