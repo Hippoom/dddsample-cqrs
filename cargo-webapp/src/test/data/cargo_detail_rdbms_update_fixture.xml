@@ -1,0 +1,18 @@
+<dataset>
+	<t_cargo_detail tracking_id="4" origin_unlocode="SHA"
+		destination_unlocode="SHA" arrival_deadline="2014-04-01"
+		routing_status="ROUTED" eta="2014-03-31" />
+
+	<t_cargo_leg_detail tracking_id="4" idx="0"
+		voyage_number="CM001" from_location="CNSHA" to_location="CNTAN" load_time="2014-03-01"
+		unload_time="2014-03-02" />
+	<t_cargo_leg_detail tracking_id="4" idx="1"
+		voyage_number="CM002" from_location="CNTAN" to_location="CNPEK" load_time="2014-03-03"
+		unload_time="2014-03-04" />
+
+	<t_cargo_detail tracking_id="5" origin_unlocode="SHA"
+		destination_unlocode="SHA" arrival_deadline="2014-04-01"
+		routing_status="NOT_ROUTED" eta="2014-04-02" />
+</dataset>
+
+

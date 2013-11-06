@@ -1,0 +1,12 @@
+[{
+	"transitEdges":[
+	    {"voyageNumber":"CM001", "fromUnLocode":"CNSHA", "toUnLocode":"CNTAN", "fromDate":"2014-04-01", "toDate":"2014-04-05"},
+	    {"voyageNumber":"CM002", "fromUnLocode":"CNTAN", "toUnLocode":"CNPEK", "fromDate":"2014-04-05", "toDate":"2014-04-06"}
+	]
+},
+{
+	"transitEdges":[
+	    {"voyageNumber":"CM003", "fromUnLocode":"CNSHA", "toUnLocode":"CNTSN", "fromDate":"2014-04-01", "toDate":"2014-04-06"},
+	    {"voyageNumber":"CM004", "fromUnLocode":"CNTSN", "toUnLocode":"CNPEK", "fromDate":"2014-04-06", "toDate":"2014-04-07"}
+	]
+}]

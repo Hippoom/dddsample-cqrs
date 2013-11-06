@@ -18,4 +18,8 @@ public class CargoRepository {
 		delegate.add(cargo);
 	}
 
+	public Cargo findBy(TrackingId trackingId) {
+		return delegate.load(trackingId);
+	}
+
 }

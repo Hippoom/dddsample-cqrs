@@ -39,4 +39,8 @@
 
 	<bean id="trackingIdGenerator"
 		class="com.github.hippoom.dddsample.cargocqrs.persistence.jpa.JpaTrackingIdGenerator" />
+
+	<bean id="cargoDetailQueryService"
+		class="com.github.hippoom.dddsample.cargocqrs.persistence.jpa.JpaCargoDetailDao">
+	</bean>
 </beans>

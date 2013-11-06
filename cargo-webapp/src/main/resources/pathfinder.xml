@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-http="http://www.springframework.org/schema/integration/http"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/integration
+	http://www.springframework.org/schema/integration/spring-integration.xsd
+	http://www.springframework.org/schema/integration/http
+	http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
+
+
+	<int:gateway id="routingService"
+		service-interface="com.github.hippoom.dddsample.cargocqrs.core.RoutingService"
+		default-request-channel="fetchRoutesForSpecificationInputChannel"
+		default-reply-channel="fetchRoutesForSpecificationOutputChannel" />
+
+	<int:channel id="fetchRoutesForSpecificationInputChannel" />
+
+	<int:transformer id="fetchRoutesRequestTranslator"
+		input-channel="fetchRoutesForSpecificationInputChannel"
+		output-channel="fetchRoutesFromPathFindInputChannel">
+		<bean
+			class="com.github.hippoom.dddsample.cargocqrs.pathfinder.FetchRouteRequestTranslator" />
+	</int:transformer>
+
+	<int:channel id="fetchRoutesFromPathFindInputChannel" />
+
+	<int-http:outbound-gateway id="pathFinderRestClient"
+		url-expression="'#{configurations.getPathFInderRoutesUrl()}' + '?spec={spec}'"
+		http-method="GET" message-converters="stringHttpMessageConverter"
+		expected-response-type="java.lang.String" request-channel="fetchRoutesFromPathFindInputChannel"
+		reply-channel="translateItinerariesInputChannel">
+		<int-http:uri-variable name="spec" expression="payload" />
+	</int-http:outbound-gateway>
+
+	<bean id="stringHttpMessageConverter"
+		class="org.springframework.http.converter.StringHttpMessageConverter">
+		<constructor-arg value="UTF-8" />
+	</bean>
+</beans>

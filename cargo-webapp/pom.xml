@@ -10,6 +10,7 @@
 		<cucumber.version>1.1.4</cucumber.version>
 		<axon.version>2.0.5</axon.version>
 		<spring.version>3.2.4.RELEASE</spring.version>
+		<spring-integration.version>2.2.5.RELEASE</spring-integration.version>
 		<hsqldb.version>2.3.0</hsqldb.version>
 		<test.suite>**/CommitTestSuite.class</test.suite>
 	</properties>
@@ -62,6 +63,40 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.1</version>
+		</dependency>
+		<!-- validation -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<!-- ESB -->
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-http</artifactId>
+			<version>${spring-integration.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-groovy</artifactId>
+			<version>${spring-integration.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-test</artifactId>
+			<version>${spring-integration.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>junit-dep</artifactId>
+					<groupId>junit</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>mockito-all</artifactId>
+					<groupId>org.mockito</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- persistence -->
 		<dependency>
@@ -123,6 +158,12 @@
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>hamcrest-core</artifactId>
+					<groupId>org.hamcrest</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -135,6 +176,16 @@
 			<artifactId>jmock-junit4</artifactId>
 			<version>2.6.0</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>hamcrest-core</artifactId>
+					<groupId>org.hamcrest</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>junit-dep</artifactId>
+					<groupId>junit</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- BDD -->
 		<dependency>
@@ -167,6 +218,12 @@
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.dreamhead</groupId>
+			<artifactId>moco-core</artifactId>
+			<version>0.8</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- code generation -->
 		<dependency>
@@ -183,6 +240,9 @@
 			</testResource>
 			<testResource>
 				<directory>src/test/stories</directory>
+			</testResource>
+			<testResource>
+				<directory>src/test/data</directory>
 			</testResource>
 		</testResources>
 		<plugins>

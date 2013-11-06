@@ -21,6 +21,8 @@ public final class UnLocode {
 	private static final Pattern VALID_PATTERN = Pattern
 			.compile("[a-zA-Z]{2}[a-zA-Z2-9]{3}");
 
+	public static final UnLocode UNKNOWN = new UnLocode("XXXXX");
+
 	/**
 	 * Constructor.
 	 * 
