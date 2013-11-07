@@ -25,6 +25,12 @@ public class Itinerary {
 		legs.add(leg);
 	}
 
+	public Itinerary(Leg... legs) {
+		for (Leg leg : legs) {
+			this.legs.add(leg);
+		}
+	}
+
 	public Itinerary(List<Leg> legs) {
 		this.legs = legs;
 	}

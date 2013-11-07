@@ -1,6 +1,7 @@
 package com.github.hippoom.dddsample.cargocqrs.core;
 
 import java.util.Date;
+import java.util.Iterator;
 
 import org.apache.commons.lang.Validate;
 
@@ -106,6 +107,22 @@ public class Delivery {
 				}
 			}
 
+		case UNLOAD:
+			for (Iterator<Leg> it = itinerary.getLegs().iterator(); it
+					.hasNext();) {
+				final Leg leg = it.next();
+				if (leg.getUnloadLocation()
+						.equals(lastHandlingEvent.location())) {
+					if (it.hasNext()) {
+						final Leg nextLeg = it.next();
+						return new HandlingActivity(HandlingType.LOAD,
+								nextLeg.getLoadLocation(),
+								nextLeg.getVoyageNumber());
+					} else {
+
+					}
+				}
+			}
 		default:
 			return HandlingActivity.NO_ACTIVITY;
 		}
@@ -140,12 +157,12 @@ public class Delivery {
 			return TransportStatus.IN_PORT;
 		case LOAD:
 			return TransportStatus.ONBOARD_CARRIER;
+		case UNLOAD:
+			return TransportStatus.IN_PORT;
 		default:
 			return TransportStatus.UNKNOWN;
 		}
 	}
-
-	
 
 	private VoyageNumber calculateCurrentVoyage(HandlingEvent lastHandlingEvent) {
 		if (transportStatus().equals(TransportStatus.ONBOARD_CARRIER)
@@ -187,7 +204,6 @@ public class Delivery {
 	public UnLocode lastKnownLocation() {
 		return lastKnownLocation;
 	}
-
 
 	public VoyageNumber currentVoyage() {
 		return currentVoyage;

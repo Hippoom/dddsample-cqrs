@@ -7,7 +7,7 @@ import cucumber.api.junit.Cucumber;
 @RunWith(Cucumber.class)
 @Cucumber.Options(features = { "classpath:" }, format = {
 		"html:target/acceptance-cucumber-html",
-		"json:target/acceptance-cucumber-json" }, name = "Operator registers a handling event of which type is LOAD")
+		"json:target/acceptance-cucumber-json" }, name = "Operator registers a handling event of which type is UNLOAD")
 public class SpecificAcceptanceTests {
 
 }

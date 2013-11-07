@@ -21,5 +21,12 @@ When I register a new handling event of which type is LOAD
 Then the transport status of the cargo is ONBOARD_CARRIER 
 And the next expected handling activity is being unloaded to the leg's unload location
 
+Scenario: Operator registers a handling event of which type is UNLOAD
+
+Given a cargo has been routed
+And the cargo is received
+When I register a new handling event of which type is UNLOAD
+Then the transport status of the cargo is IN_PORT 
+And the next expected handling activity is being loaded to the next leg's voyage
  
 

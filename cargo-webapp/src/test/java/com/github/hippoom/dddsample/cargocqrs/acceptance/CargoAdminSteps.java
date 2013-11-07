@@ -252,10 +252,8 @@ public class CargoAdminSteps implements ApplicationContextAware {
 				.andDo(print()).andExpect(status().isOk());
 	}
 
-
 	private RegisterHandlingEventRequest firstHandlingEventOf(CargoDto cargo)
 			throws Throwable {
-
 
 		request = new RegisterHandlingEventRequest();
 		request.setTrackingId(cargo.getTrackingId());
@@ -307,9 +305,20 @@ public class CargoAdminSteps implements ApplicationContextAware {
 	private RegisterHandlingEventRequest aLoadHandlingEventOf(CargoDto cargo) {
 		request = new RegisterHandlingEventRequest();
 		LegDto firstLeg = cargo.getLegs().get(0);
-		request.setCompletionTime(firstLeg.getUnloadTime());
+		request.setCompletionTime(firstLeg.getLoadTime());
 		request.setHandlingType(HandlingType.LOAD.getCode());
 		request.setLocation(firstLeg.getFrom());
+		request.setTrackingId(cargo.getTrackingId());
+		request.setVoyageNumber(firstLeg.getVoyageNumber());
+		return request;
+	}
+
+	private RegisterHandlingEventRequest anUnloadHandlingEventOf(CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto firstLeg = cargo.getLegs().get(0);
+		request.setCompletionTime(firstLeg.getUnloadTime());
+		request.setHandlingType(HandlingType.UNLOAD.getCode());
+		request.setLocation(firstLeg.getTo());
 		request.setTrackingId(cargo.getTrackingId());
 		request.setVoyageNumber(firstLeg.getVoyageNumber());
 		return request;
@@ -339,6 +348,24 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		assertThat(cargo.getNextExpectedHandlingActivityType(),
 				equalTo(HandlingType.UNLOAD.getCode()));
 
+	}
+
+	@When("^I register a new handling event of which type is UNLOAD$")
+	public void I_register_a_new_handling_event_of_which_type_is_UNLOAD()
+			throws Throwable {
+		registerHandlingEvent(anUnloadHandlingEventOf(cargo));
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	@Then("^the next expected handling activity is being loaded to the next leg's voyage$")
+	public void the_next_expected_handling_activity_is_being_loaded_to_the_next_leg_s_voyage()
+			throws Throwable {
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getLegs().get(1).getFrom()));
+		assertThat(cargo.getNextExpectedHandlingActivityVoyageNumber(),
+				equalTo(cargo.getLegs().get(1).getVoyageNumber()));
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.LOAD.getCode()));
 	}
 
 	@Override
