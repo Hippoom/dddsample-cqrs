@@ -9,6 +9,7 @@ import static com.github.dreamhead.moco.Moco.uri;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -16,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.io.IOException;
@@ -313,9 +314,32 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		return request;
 	}
 
+	private RegisterHandlingEventRequest lastLoadHandlingEventOf(CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto leg = cargo.getLegs().get(1);
+		request.setCompletionTime(leg.getLoadTime());
+		request.setHandlingType(HandlingType.LOAD.getCode());
+		request.setLocation(leg.getFrom());
+		request.setTrackingId(cargo.getTrackingId());
+		request.setVoyageNumber(leg.getVoyageNumber());
+		return request;
+	}
+
 	private RegisterHandlingEventRequest anUnloadHandlingEventOf(CargoDto cargo) {
 		request = new RegisterHandlingEventRequest();
 		LegDto firstLeg = cargo.getLegs().get(0);
+		request.setCompletionTime(firstLeg.getUnloadTime());
+		request.setHandlingType(HandlingType.UNLOAD.getCode());
+		request.setLocation(firstLeg.getTo());
+		request.setTrackingId(cargo.getTrackingId());
+		request.setVoyageNumber(firstLeg.getVoyageNumber());
+		return request;
+	}
+
+	private RegisterHandlingEventRequest lastUnloadHandlingEventOf(
+			CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto firstLeg = cargo.getLegs().get(1);
 		request.setCompletionTime(firstLeg.getUnloadTime());
 		request.setHandlingType(HandlingType.UNLOAD.getCode());
 		request.setLocation(firstLeg.getTo());
@@ -366,6 +390,31 @@ public class CargoAdminSteps implements ApplicationContextAware {
 				equalTo(cargo.getLegs().get(1).getVoyageNumber()));
 		assertThat(cargo.getNextExpectedHandlingActivityType(),
 				equalTo(HandlingType.LOAD.getCode()));
+	}
+
+	@When("^I register the last handling event of which type is UNLOAD$")
+	public void I_register_the_last_handling_event_of_which_type_is_UNLOAD()
+			throws Throwable {
+		I_register_a_new_handling_event_of_which_type_is_UNLOAD();
+		registerHandlingEvent(lastLoadHandlingEventOf(cargo));
+		registerHandlingEvent(lastUnloadHandlingEventOf(cargo));
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	@Then("^the next expected handling activity is claimed at the destination$")
+	public void the_next_expected_handling_activity_is_claimed_at_the_destination()
+			throws Throwable {
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getLegs().get(1).getTo()));
+		assertThat(cargo.getNextExpectedHandlingActivityVoyageNumber(),
+				is(nullValue()));
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.CLAIM.getCode()));
+	}
+
+	@Then("^the cargo is unloaded at the destination$")
+	public void the_cargo_is_unloaded_at_the_destination() throws Throwable {
+		assertThat(cargo.getUnloadedAtDestinationIndicator(), equalTo("1"));
 	}
 
 	@Override

@@ -29,4 +29,11 @@ When I register a new handling event of which type is UNLOAD
 Then the transport status of the cargo is IN_PORT 
 And the next expected handling activity is being loaded to the next leg's voyage
  
+Scenario: Operator registers the last handling event of which type is UNLOAD
 
+Given a cargo has been routed
+And the cargo is received
+When I register the last handling event of which type is UNLOAD
+Then the transport status of the cargo is IN_PORT
+And the cargo is unloaded at the destination
+And the next expected handling activity is claimed at the destination

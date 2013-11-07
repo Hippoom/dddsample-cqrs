@@ -19,6 +19,7 @@ public class Delivery {
 	private HandlingActivity nextExpectedHandlingActivity;
 	private UnLocode lastKnownLocation;
 	private VoyageNumber currentVoyage;
+	private boolean isUnloadedAtDestination;
 
 	/**
 	 * Creates a new delivery snapshot based on the complete handling history of
@@ -78,6 +79,9 @@ public class Delivery {
 		this.lastKnownLocation = calculateLastKnownLocation(handlingEvent);
 
 		this.currentVoyage = calculateCurrentVoyage(handlingEvent);
+
+		this.isUnloadedAtDestination = calculateUnloadedAtDestination(
+				routeSpecification, handlingEvent);
 	}
 
 	public Delivery(Itinerary itinerary, RouteSpecification routeSpecification) {
@@ -119,7 +123,8 @@ public class Delivery {
 								nextLeg.getLoadLocation(),
 								nextLeg.getVoyageNumber());
 					} else {
-
+						return new HandlingActivity(HandlingType.CLAIM,
+								leg.getUnloadLocation());
 					}
 				}
 			}
@@ -181,6 +186,15 @@ public class Delivery {
 		}
 	}
 
+	private boolean calculateUnloadedAtDestination(
+			RouteSpecification routeSpecification,
+			HandlingEvent lastHandlingEvent) {
+		return lastHandlingEvent != null
+				&& HandlingType.UNLOAD.equals(lastHandlingEvent.type())
+				&& routeSpecification.getDestination().equals(
+						lastHandlingEvent.location());
+	}
+
 	private boolean onTrack() {
 		return routingStatus.equals(RoutingStatus.ROUTED);
 	}
@@ -209,4 +223,7 @@ public class Delivery {
 		return currentVoyage;
 	}
 
+	public boolean isUnloadedAtDestination() {
+		return isUnloadedAtDestination;
+	}
 }

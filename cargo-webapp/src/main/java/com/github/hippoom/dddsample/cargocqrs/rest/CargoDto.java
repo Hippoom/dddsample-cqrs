@@ -68,6 +68,9 @@ public class CargoDto {
 
 	@Column(name = "current_voyage")
 	private String currentVoyageNumber;
+	
+	@Column(name = "is_unloaded_des")
+	private String unloadedAtDestinationIndicator;
 
 	@ElementCollection
 	@CollectionTable(name = "t_cargo_leg_detail", joinColumns = @JoinColumn(name = "tracking_id"))

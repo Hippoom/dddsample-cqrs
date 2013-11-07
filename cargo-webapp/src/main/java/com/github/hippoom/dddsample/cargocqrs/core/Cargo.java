@@ -11,6 +11,7 @@ import org.axonframework.eventsourcing.annotation.AggregateIdentifier;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoCurrentVoyageUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoIsUnloadedAtDestinationEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoLastKnownLocationUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoTransportStatusRecalculatedEvent;
@@ -89,6 +90,9 @@ public class Cargo extends AbstractAnnotatedAggregateRoot<TrackingId> {
 		}
 		apply(new NextExpectedHandlingActivityCalculatedEvent(this.trackingId,
 				delivery.nextExpectedHandlingActivity()));
+		if (delivery.isUnloadedAtDestination()) {
+			apply(new CargoIsUnloadedAtDestinationEvent(this.trackingId));
+		}
 	}
 
 	@EventHandler
