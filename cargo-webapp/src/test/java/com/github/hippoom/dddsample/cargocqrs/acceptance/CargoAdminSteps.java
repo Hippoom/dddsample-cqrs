@@ -252,8 +252,10 @@ public class CargoAdminSteps implements ApplicationContextAware {
 				.andDo(print()).andExpect(status().isOk());
 	}
 
+
 	private RegisterHandlingEventRequest firstHandlingEventOf(CargoDto cargo)
 			throws Throwable {
+
 
 		request = new RegisterHandlingEventRequest();
 		request.setTrackingId(cargo.getTrackingId());
@@ -336,6 +338,7 @@ public class CargoAdminSteps implements ApplicationContextAware {
 				equalTo(cargo.getLegs().get(0).getVoyageNumber()));
 		assertThat(cargo.getNextExpectedHandlingActivityType(),
 				equalTo(HandlingType.UNLOAD.getCode()));
+
 	}
 
 	@Override

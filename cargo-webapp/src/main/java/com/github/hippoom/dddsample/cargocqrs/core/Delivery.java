@@ -75,6 +75,7 @@ public class Delivery {
 		this.nextExpectedHandlingActivity = calculateNextExpectedActivity(
 				routeSpecification, itinerary, handlingEvent);
 		this.lastKnownLocation = calculateLastKnownLocation(handlingEvent);
+
 		this.currentVoyage = calculateCurrentVoyage(handlingEvent);
 	}
 
@@ -96,6 +97,7 @@ public class Delivery {
 			final Leg firstLeg = itinerary.getLegs().iterator().next();
 			return new HandlingActivity(HandlingType.LOAD,
 					firstLeg.getLoadLocation(), firstLeg.getVoyageNumber());
+
 		case LOAD:
 			for (Leg leg : itinerary.getLegs()) {
 				if (leg.getLoadLocation().equals(lastHandlingEvent.location())) {
@@ -103,6 +105,7 @@ public class Delivery {
 							leg.getUnloadLocation(), leg.getVoyageNumber());
 				}
 			}
+
 		default:
 			return HandlingActivity.NO_ACTIVITY;
 		}
@@ -142,18 +145,20 @@ public class Delivery {
 		}
 	}
 
-	private UnLocode calculateLastKnownLocation(HandlingEvent lastHandlingEvent) {
-		if (lastHandlingEvent != null) {
-			return lastHandlingEvent.location();
-		} else {
-			return null;
-		}
-	}
+	
 
 	private VoyageNumber calculateCurrentVoyage(HandlingEvent lastHandlingEvent) {
 		if (transportStatus().equals(TransportStatus.ONBOARD_CARRIER)
 				&& lastHandlingEvent != null) {
 			return lastHandlingEvent.voyage();
+		} else {
+			return null;
+		}
+	}
+
+	private UnLocode calculateLastKnownLocation(HandlingEvent lastHandlingEvent) {
+		if (lastHandlingEvent != null) {
+			return lastHandlingEvent.location();
 		} else {
 			return null;
 		}
@@ -182,6 +187,7 @@ public class Delivery {
 	public UnLocode lastKnownLocation() {
 		return lastKnownLocation;
 	}
+
 
 	public VoyageNumber currentVoyage() {
 		return currentVoyage;
