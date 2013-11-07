@@ -6,6 +6,7 @@ import org.axonframework.commandhandling.annotation.CommandHandler;
 
 import com.github.hippoom.dddsample.cargocqrs.command.AssignCargoToRouteCommand;
 import com.github.hippoom.dddsample.cargocqrs.command.RegisterCargoCommand;
+import com.github.hippoom.dddsample.cargocqrs.command.RegisterHandlingEventCommand;
 import com.github.hippoom.dddsample.cargocqrs.core.Cargo;
 import com.github.hippoom.dddsample.cargocqrs.core.CargoRepository;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
@@ -27,5 +28,11 @@ public class CargoCommandHandler {
 	public void handle(AssignCargoToRouteCommand command) {
 		final Cargo cargo = cargoRepository.findBy(command.getTrackingId());
 		cargo.assignToRoute(command.getItinerary());
+	}
+
+	@CommandHandler
+	public void handle(RegisterHandlingEventCommand command) {
+		final Cargo cargo = cargoRepository.findBy(command.getTrackingId());
+		cargo.deriveDeliveryProgress(command.handlingEvent());
 	}
 }

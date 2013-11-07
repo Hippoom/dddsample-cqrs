@@ -1,7 +1,7 @@
 <dataset>
 	<t_cargo_detail tracking_id="4" origin_unlocode="SHA"
 		destination_unlocode="SHA" arrival_deadline="2014-04-01"
-		routing_status="ROUTED" eta="2014-03-31" />
+		routing_status="ROUTED" eta="2014-03-31" ne_ha_type="1" ne_ha_location="CNPEK"/>
 
 	<t_cargo_leg_detail tracking_id="4" idx="0"
 		voyage_number="CM001" from_location="CNSHA" to_location="CNTAN" load_time="2014-03-01"
@@ -12,7 +12,7 @@
 
 	<t_cargo_detail tracking_id="5" origin_unlocode="SHA"
 		destination_unlocode="SHA" arrival_deadline="2014-04-01"
-		routing_status="NOT_ROUTED" eta="2014-04-02" />
+		routing_status="NOT_ROUTED" eta="2014-04-02" ne_ha_type="0" ne_ha_location="CNSHA"/>
 </dataset>
 
 

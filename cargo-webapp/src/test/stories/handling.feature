@@ -8,7 +8,7 @@ Scenario: Operator registers a handling event of which type is load
 
 Given a cargo has been routed
 When I register a new handling event of which type is load 
-Then the transporting status of the cargo is ONBOARD_CARRIER
+Then the transport status of the cargo is IN_PORT
 And the last known location of the cargo is updated as the location of the handling event
 And the current voyage of the cargo is updated as the voyage of the handling event
 And the next expected handling activity is being shipped by the leg's voyage and unloading

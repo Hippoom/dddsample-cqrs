@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.io.IOException;
@@ -43,9 +43,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dreamhead.moco.HttpServer;
 import com.github.dreamhead.moco.internal.ActualHttpServer;
 import com.github.dreamhead.moco.internal.MocoHttpServer;
+import com.github.hippoom.dddsample.cargocqrs.core.HandlingType;
 import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
+import com.github.hippoom.dddsample.cargocqrs.core.TransportStatus;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
+import com.github.hippoom.dddsample.cargocqrs.rest.RegisterHandlingEventRequest;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
 import cucumber.api.PendingException;
@@ -154,13 +157,17 @@ public class CargoAdminSteps implements ApplicationContextAware {
 
 	@When("^I pick up a candidate$")
 	public void I_pick_up_a_candidate() throws Throwable {
+		assignCargoToRoute();
+
+	}
+
+	private void assignCargoToRoute() throws Exception, JsonProcessingException {
 		mockMvc()
 				.perform(
 						post("/cargo/" + this.trackingId).content(
 								json(routeCandidates.get(0))).contentType(
 								MediaType.APPLICATION_JSON)).andDo(print())
 				.andExpect(status().isOk());
-
 	}
 
 	private byte[] json(RouteCandidateDto routeCandidateDto)
@@ -189,6 +196,22 @@ public class CargoAdminSteps implements ApplicationContextAware {
 				.getUnloadTime()));
 	}
 
+	@Then("^the transport status of the cargo is NOT_RECEIVED$")
+	public void the_transport_status_of_the_cargo_is_NOT_RECEIVED()
+			throws Throwable {
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.NOT_RECEIVED.getCode()));
+	}
+
+	@Then("^the next expected handling activity is being received at the origin of the route specification$")
+	public void the_next_expected_handling_activity_is_being_received_at_the_origin_of_the_route_specification()
+			throws Throwable {
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.RECEIVE.getCode()));
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getOriginUnlocode()));
+	}
+
 	private CargoDto findCargoBy(String trackingId) throws Exception {
 		final MvcResult result = mockMvc()
 				.perform(get("/cargo/" + this.trackingId)).andDo(print())
@@ -200,38 +223,46 @@ public class CargoAdminSteps implements ApplicationContextAware {
 				.getContentAsByteArray(), CargoDto.class);
 	}
 
-	@Then("^the transporting status of the cargo is NOT_RECEIVED$")
-	public void the_transporting_status_of_the_cargo_is_NOT_RECEIVED()
-			throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
-	}
-
-	@Then("^the next expected handling activity is being received at the origin of the route specification$")
-	public void the_next_expected_handling_activity_is_being_received_at_the_origin_of_the_route_specification()
-			throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
-	}
-
 	@Given("^a cargo has been routed$")
 	public void a_cargo_has_been_routed() throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
+		this.trackingId = aNewCargoIsRegistered();
+
+		I_request_possible_routes_for_the_cargo();
+		assignCargoToRoute();
+		this.cargo = findCargoBy(trackingId);
 	}
 
 	@When("^I register a new handling event of which type is load$")
 	public void I_register_a_new_handling_event_of_which_type_is_load()
 			throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
+		mockMvc()
+				.perform(
+						put("/handlingevent/").content(handlingEvent(cargo))
+								.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print()).andExpect(status().isOk());
+		this.cargo = findCargoBy(trackingId);
 	}
 
-	@Then("^the transporting status of the cargo is ONBOARD_CARRIER$")
-	public void the_transporting_status_of_the_cargo_is_ONBOARD_CARRIER()
+	private byte[] handlingEvent(CargoDto cargo) throws Throwable {
+		ObjectMapper objectMapper = new ObjectMapper();
+		// objectMapper.setDateFormat(new
+		// SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+
+		RegisterHandlingEventRequest request = new RegisterHandlingEventRequest();
+		request.setTrackingId(cargo.getTrackingId());
+		request.setHandlingType(cargo.getNextExpectedHandlingActivityType());
+		request.setLocation(cargo.getNextExpectedHandlingActivityLocation());
+		request.setVoyageNumber(cargo.getLegs().get(0).getVoyageNumber());
+		request.setCompletionTime(cargo.getLegs().get(0).getUnloadTime());
+
+		return objectMapper.writeValueAsBytes(request);
+	}
+
+	@Then("^the transporting status of the cargo is IN_PORT$")
+	public void the_transporting_status_of_the_cargo_is_IN_PORT()
 			throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.IN_PORT.getCode()));
 	}
 
 	@Then("^the last known location of the cargo is updated as the location of the handling event$")

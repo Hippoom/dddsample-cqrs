@@ -4,9 +4,12 @@ import lombok.Setter;
 
 import org.axonframework.eventhandling.annotation.EventHandler;
 
+import com.github.hippoom.dddsample.cargocqrs.core.TransportStatus;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoTransportStatusRecalculatedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.NextExpectedHandlingActivityCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.persistence.CargoDetailDao;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 
@@ -16,7 +19,9 @@ public class CargoDetailEventHandler {
 
 	@EventHandler
 	public void on(CargoRegisteredEvent event) {
-		cargoDetailDao.store(from(event));
+		final CargoDto cargo = from(event);
+		cargo.setTransportStatus(TransportStatus.NOT_RECEIVED.getCode());
+		cargoDetailDao.store(cargo);
 	}
 
 	@EventHandler
@@ -31,6 +36,21 @@ public class CargoDetailEventHandler {
 	public void on(CargoEtaCalculatedEvent event) {
 		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
 		cargo.setEta(event.getEta());
+		cargoDetailDao.store(cargo);
+	}
+
+	@EventHandler
+	public void on(NextExpectedHandlingActivityCalculatedEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setNextExpectedHandlingActivityType(event.getType());
+		cargo.setNextExpectedHandlingActivityLocation(event.getLocation());
+		cargoDetailDao.store(cargo);
+	}
+
+	@EventHandler
+	public void on(CargoTransportStatusRecalculatedEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setTransportStatus(event.getTransportStatus());
 		cargoDetailDao.store(cargo);
 	}
 

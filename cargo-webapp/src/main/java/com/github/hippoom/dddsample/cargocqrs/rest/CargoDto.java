@@ -47,12 +47,22 @@ public class CargoDto {
 	@Column(name = "routing_status")
 	private String routingStatus;
 
+	@Column(name = "transport_status")
+	private String transportStatus;
+
 	@Temporal(value = TemporalType.DATE)
 	@Column(name = "eta")
 	private Date eta;
+
+	@Column(name = "ne_ha_type")
+	private String nextExpectedHandlingActivityType;
+
+	@Column(name = "ne_ha_location")
+	private String nextExpectedHandlingActivityLocation;
 
 	@ElementCollection
 	@CollectionTable(name = "t_cargo_leg_detail", joinColumns = @JoinColumn(name = "tracking_id"))
 	@OrderBy("index")
 	private List<LegDto> legs;
+
 }
