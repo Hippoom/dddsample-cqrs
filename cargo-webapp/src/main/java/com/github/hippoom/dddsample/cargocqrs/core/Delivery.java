@@ -16,7 +16,8 @@ public class Delivery {
 	private TransportStatus transportStatus;
 	private Date eta;
 	private HandlingActivity nextExpectedHandlingActivity;
-	private HandlingEvent lastHandlingEvent;
+	private UnLocode lastKnownLocation;
+	private VoyageNumber currentVoyage;
 
 	/**
 	 * Creates a new delivery snapshot based on the complete handling history of
@@ -67,13 +68,14 @@ public class Delivery {
 	private Delivery(Itinerary itinerary,
 			RouteSpecification routeSpecification, HandlingEvent handlingEvent) {
 		Validate.notNull(routeSpecification, "Route specification is required");
-		this.lastHandlingEvent = handlingEvent;
 		this.routingStatus = calculateRoutingStatus(itinerary,
 				routeSpecification);
 		this.transportStatus = calculateTransportStatus(handlingEvent);
 		this.eta = calculateEta(itinerary);
 		this.nextExpectedHandlingActivity = calculateNextExpectedActivity(
-				routeSpecification, itinerary);
+				routeSpecification, itinerary, handlingEvent);
+		this.lastKnownLocation = calculateLastKnownLocation(handlingEvent);
+		this.currentVoyage = calculateCurrentVoyage(handlingEvent);
 	}
 
 	public Delivery(Itinerary itinerary, RouteSpecification routeSpecification) {
@@ -81,9 +83,30 @@ public class Delivery {
 	}
 
 	private HandlingActivity calculateNextExpectedActivity(
-			RouteSpecification routeSpecification, Itinerary itinerary) {
-		return new HandlingActivity(HandlingType.RECEIVE,
-				routeSpecification.getOrigin());
+			RouteSpecification routeSpecification, Itinerary itinerary,
+			HandlingEvent lastHandlingEvent) {
+
+		if (lastHandlingEvent == null) {
+			return new HandlingActivity(HandlingType.RECEIVE,
+					routeSpecification.getOrigin());
+		}
+
+		switch (lastHandlingEvent.type()) {
+		case RECEIVE:
+			final Leg firstLeg = itinerary.getLegs().iterator().next();
+			return new HandlingActivity(HandlingType.LOAD,
+					firstLeg.getLoadLocation(), firstLeg.getVoyageNumber());
+		case LOAD:
+			for (Leg leg : itinerary.getLegs()) {
+				if (leg.getLoadLocation().equals(lastHandlingEvent.location())) {
+					return new HandlingActivity(HandlingType.UNLOAD,
+							leg.getUnloadLocation(), leg.getVoyageNumber());
+				}
+			}
+		default:
+			return HandlingActivity.NO_ACTIVITY;
+		}
+
 	}
 
 	private RoutingStatus calculateRoutingStatus(Itinerary itinerary,
@@ -112,8 +135,27 @@ public class Delivery {
 		switch (lastHandlingEvent.type()) {
 		case RECEIVE:
 			return TransportStatus.IN_PORT;
+		case LOAD:
+			return TransportStatus.ONBOARD_CARRIER;
 		default:
 			return TransportStatus.UNKNOWN;
+		}
+	}
+
+	private UnLocode calculateLastKnownLocation(HandlingEvent lastHandlingEvent) {
+		if (lastHandlingEvent != null) {
+			return lastHandlingEvent.location();
+		} else {
+			return null;
+		}
+	}
+
+	private VoyageNumber calculateCurrentVoyage(HandlingEvent lastHandlingEvent) {
+		if (transportStatus().equals(TransportStatus.ONBOARD_CARRIER)
+				&& lastHandlingEvent != null) {
+			return lastHandlingEvent.voyage();
+		} else {
+			return null;
 		}
 	}
 
@@ -133,12 +175,16 @@ public class Delivery {
 		return transportStatus;
 	}
 
-	public HandlingEvent lastHandlingEvent() {
-		return lastHandlingEvent;
-	}
-
 	public Date eta() {
 		return eta;
+	}
+
+	public UnLocode lastKnownLocation() {
+		return lastKnownLocation;
+	}
+
+	public VoyageNumber currentVoyage() {
+		return currentVoyage;
 	}
 
 }

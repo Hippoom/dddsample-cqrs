@@ -14,7 +14,7 @@ import org.apache.commons.lang.Validate;
 @EqualsAndHashCode
 @ToString
 public class HandlingActivity {
-
+	static final HandlingActivity NO_ACTIVITY = null;
 	private HandlingType type;
 	private UnLocode location;
 	private VoyageNumber voyage;
