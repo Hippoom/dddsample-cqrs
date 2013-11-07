@@ -9,6 +9,8 @@ import com.github.hippoom.dddsample.cargocqrs.core.Itinerary;
 import com.github.hippoom.dddsample.cargocqrs.core.Leg;
 import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
+import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
+import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
@@ -41,6 +43,16 @@ public class CargoAssignedEvent {
 					.getUnlocode(), leg.getLoadTime(), leg.getUnloadTime()));
 		}
 		return new RouteCandidateDto(legs);
+	}
+
+	public Itinerary itinerary() {
+		final List<Leg> legs = new ArrayList<Leg>();
+		for (LegDto leg : route.getLegs()) {
+			legs.add(new Leg(new VoyageNumber(leg.getVoyageNumber()),
+					new UnLocode(leg.getFrom()), new UnLocode(leg.getTo()), leg
+							.getLoadTime(), leg.getUnloadTime()));
+		}
+		return new Itinerary(legs);
 	}
 
 }

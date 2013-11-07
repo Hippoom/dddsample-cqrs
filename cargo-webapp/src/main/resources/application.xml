@@ -15,6 +15,11 @@
 		<property name="cargoDetailQueryService" ref="cargoDetailQueryService" />
 		<property name="routingService" ref="routingService" />
 	</bean>
+	<bean id="handlingApplication"
+		class="com.github.hippoom.dddsample.cargocqrs.application.HandlingApplication">
+		<property name="commandGateway" ref="commandGateway" />
+		<property name="clock" ref="clock" />
+	</bean>
 
 	<bean id="cargoCommandHandler"
 		class="com.github.hippoom.dddsample.cargocqrs.application.CargoCommandHandler">

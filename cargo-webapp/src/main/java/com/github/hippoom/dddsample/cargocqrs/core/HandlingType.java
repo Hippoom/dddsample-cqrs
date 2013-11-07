@@ -11,4 +11,13 @@ public enum HandlingType {
 		this.code = code;
 	}
 
+	public static HandlingType of(String code) {
+		for (HandlingType candidate : values()) {
+			if (candidate.getCode().equals(code)) {
+				return candidate;
+			}
+		}
+		throw new IllegalArgumentException("Invalid code for HandlingType:"
+				+ code);
+	}
 }

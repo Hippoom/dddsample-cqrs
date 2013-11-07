@@ -9,6 +9,7 @@ import static com.github.dreamhead.moco.Moco.uri;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -48,6 +49,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
 import com.github.hippoom.dddsample.cargocqrs.core.TransportStatus;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
+import com.github.hippoom.dddsample.cargocqrs.rest.RegisterHandlingEventRequest;
 import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
 import cucumber.api.PendingException;
@@ -71,6 +73,8 @@ public class CargoAdminSteps implements ApplicationContextAware {
 	private CargoDto cargo;
 
 	private List<RouteCandidateDto> routeCandidates;
+
+	private RegisterHandlingEventRequest request;
 
 	@When("^I fill the form with origin, destination and arrival deadline$")
 	public void I_fill_the_form_with_origin_destination_and_arrival_deadline()
@@ -156,13 +160,17 @@ public class CargoAdminSteps implements ApplicationContextAware {
 
 	@When("^I pick up a candidate$")
 	public void I_pick_up_a_candidate() throws Throwable {
+		assignCargoToRoute();
+
+	}
+
+	private void assignCargoToRoute() throws Exception, JsonProcessingException {
 		mockMvc()
 				.perform(
 						post("/cargo/" + this.trackingId).content(
 								json(routeCandidates.get(0))).contentType(
 								MediaType.APPLICATION_JSON)).andDo(print())
 				.andExpect(status().isOk());
-
 	}
 
 	private byte[] json(RouteCandidateDto routeCandidateDto)
@@ -216,6 +224,227 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
 		return objectMapper.readValue(result.getResponse()
 				.getContentAsByteArray(), CargoDto.class);
+	}
+
+	@Given("^a cargo has been routed$")
+	public void a_cargo_has_been_routed() throws Throwable {
+		this.trackingId = aNewCargoIsRegistered();
+
+		I_request_possible_routes_for_the_cargo();
+		assignCargoToRoute();
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	@When("^I register a new handling event of which type is RECEIVE$")
+	public void I_register_a_new_handling_event_of_which_type_is_RECEIVE()
+			throws Throwable {
+		registerHandlingEvent(firstHandlingEventOf(cargo));
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	private void registerHandlingEvent(RegisterHandlingEventRequest request)
+			throws Exception, Throwable {
+		ObjectMapper objectMapper = new ObjectMapper();
+		mockMvc()
+				.perform(
+						put("/handlingevent/").content(
+								objectMapper.writeValueAsBytes(request))
+								.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print()).andExpect(status().isOk());
+	}
+
+	private RegisterHandlingEventRequest firstHandlingEventOf(CargoDto cargo)
+			throws Throwable {
+
+		request = new RegisterHandlingEventRequest();
+		request.setTrackingId(cargo.getTrackingId());
+		request.setHandlingType(cargo.getNextExpectedHandlingActivityType());
+		request.setLocation(cargo.getNextExpectedHandlingActivityLocation());
+		request.setVoyageNumber(cargo.getLegs().get(0).getVoyageNumber());
+		request.setCompletionTime(cargo.getLegs().get(0).getUnloadTime());
+
+		return request;
+	}
+
+	@Then("^the transport status of the cargo is IN_PORT$")
+	public void the_transport_status_of_the_cargo_is_IN_PORT() throws Throwable {
+
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.IN_PORT.getCode()));
+	}
+
+	@Then("^the last known location of the cargo is updated as the location of the handling event$")
+	public void the_last_known_location_of_the_cargo_is_updated_as_the_location_of_the_handling_event()
+			throws Throwable {
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.IN_PORT.getCode()));
+	}
+
+	@Then("^the current voyage of the cargo is updated as the voyage of the handling event$")
+	public void the_current_voyage_of_the_cargo_is_updated_as_the_voyage_of_the_handling_event()
+			throws Throwable {
+		assertThat(cargo.getLastKnownLocation(), equalTo(request.getLocation()));
+	}
+
+	@Then("^the next expected handling activity is being loaded to the leg's voyage$")
+	public void the_next_expected_handling_activity_is_being_loaded_to_the_legs_voyage()
+			throws Throwable {
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getLegs().get(0).getFrom()));
+		assertThat(cargo.getNextExpectedHandlingActivityVoyageNumber(),
+				equalTo(cargo.getLegs().get(0).getVoyageNumber()));
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.LOAD.getCode()));
+	}
+
+	@Given("^the cargo is received$")
+	public void the_cargo_is_received() throws Throwable {
+		I_register_a_new_handling_event_of_which_type_is_RECEIVE();
+
+	}
+
+	private RegisterHandlingEventRequest aLoadHandlingEventOf(CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto firstLeg = cargo.getLegs().get(0);
+		request.setCompletionTime(firstLeg.getLoadTime());
+		request.setHandlingType(HandlingType.LOAD.getCode());
+		request.setLocation(firstLeg.getFrom());
+		request.setTrackingId(cargo.getTrackingId());
+		request.setVoyageNumber(firstLeg.getVoyageNumber());
+		return request;
+	}
+
+	private RegisterHandlingEventRequest lastLoadHandlingEventOf(CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto leg = cargo.getLegs().get(1);
+		request.setCompletionTime(leg.getLoadTime());
+		request.setHandlingType(HandlingType.LOAD.getCode());
+		request.setLocation(leg.getFrom());
+		request.setTrackingId(cargo.getTrackingId());
+		request.setVoyageNumber(leg.getVoyageNumber());
+		return request;
+	}
+
+	private RegisterHandlingEventRequest anUnloadHandlingEventOf(CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto firstLeg = cargo.getLegs().get(0);
+		request.setCompletionTime(firstLeg.getUnloadTime());
+		request.setHandlingType(HandlingType.UNLOAD.getCode());
+		request.setLocation(firstLeg.getTo());
+		request.setTrackingId(cargo.getTrackingId());
+		request.setVoyageNumber(firstLeg.getVoyageNumber());
+		return request;
+	}
+
+	private RegisterHandlingEventRequest lastUnloadHandlingEventOf(
+			CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto firstLeg = cargo.getLegs().get(1);
+		request.setCompletionTime(firstLeg.getUnloadTime());
+		request.setHandlingType(HandlingType.UNLOAD.getCode());
+		request.setLocation(firstLeg.getTo());
+		request.setTrackingId(cargo.getTrackingId());
+		request.setVoyageNumber(firstLeg.getVoyageNumber());
+		return request;
+	}
+
+	private RegisterHandlingEventRequest claimedHandlingEventOf(CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto firstLeg = cargo.getLegs().get(1);
+		request.setCompletionTime(firstLeg.getUnloadTime());
+		request.setHandlingType(HandlingType.CLAIM.getCode());
+		request.setLocation(firstLeg.getTo());
+		request.setTrackingId(cargo.getTrackingId());
+		return request;
+	}
+
+	@When("^I register a new handling event of which type is LOAD$")
+	public void I_register_a_new_handling_event_of_which_type_is_LOAD()
+			throws Throwable {
+		registerHandlingEvent(aLoadHandlingEventOf(cargo));
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	@Then("^the transport status of the cargo is ONBOARD_CARRIER$")
+	public void the_transport_status_of_the_cargo_is_ONBOARD_CARRIER()
+			throws Throwable {
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.ONBOARD_CARRIER.getCode()));
+	}
+
+	@Then("^the next expected handling activity is being unloaded to the leg's unload location$")
+	public void the_next_expected_handling_activity_is_being_unloaded_to_the_leg_s_unload_location()
+			throws Throwable {
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getLegs().get(0).getTo()));
+		assertThat(cargo.getNextExpectedHandlingActivityVoyageNumber(),
+				equalTo(cargo.getLegs().get(0).getVoyageNumber()));
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.UNLOAD.getCode()));
+
+	}
+
+	@When("^I register a new handling event of which type is UNLOAD$")
+	public void I_register_a_new_handling_event_of_which_type_is_UNLOAD()
+			throws Throwable {
+		registerHandlingEvent(anUnloadHandlingEventOf(cargo));
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	@Then("^the next expected handling activity is being loaded to the next leg's voyage$")
+	public void the_next_expected_handling_activity_is_being_loaded_to_the_next_leg_s_voyage()
+			throws Throwable {
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getLegs().get(1).getFrom()));
+		assertThat(cargo.getNextExpectedHandlingActivityVoyageNumber(),
+				equalTo(cargo.getLegs().get(1).getVoyageNumber()));
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.LOAD.getCode()));
+	}
+
+	@When("^I register the last handling event of which type is UNLOAD$")
+	public void I_register_the_last_handling_event_of_which_type_is_UNLOAD()
+			throws Throwable {
+		I_register_a_new_handling_event_of_which_type_is_UNLOAD();
+		registerHandlingEvent(lastLoadHandlingEventOf(cargo));
+		registerHandlingEvent(lastUnloadHandlingEventOf(cargo));
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	@Then("^the next expected handling activity is claimed at the destination$")
+	public void the_next_expected_handling_activity_is_claimed_at_the_destination()
+			throws Throwable {
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getLegs().get(1).getTo()));
+		assertThat(cargo.getNextExpectedHandlingActivityVoyageNumber(),
+				is(nullValue()));
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.CLAIM.getCode()));
+	}
+
+	@Then("^the cargo is unloaded at the destination$")
+	public void the_cargo_is_unloaded_at_the_destination() throws Throwable {
+		assertThat(cargo.getUnloadedAtDestinationIndicator(), equalTo("1"));
+	}
+
+	@Given("^the cargo has been unloaded at the destination$")
+	public void the_cargo_has_been_unloaded_at_the_destination()
+			throws Throwable {
+		I_register_a_new_handling_event_of_which_type_is_RECEIVE();
+		I_register_the_last_handling_event_of_which_type_is_UNLOAD();
+	}
+
+	@When("^I register a handling event of which type is CLAIM$")
+	public void I_register_a_handling_event_of_which_type_is_CLAIM()
+			throws Throwable {
+		registerHandlingEvent(claimedHandlingEventOf(cargo));
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	@Then("^the transport status of the cargo is CLAIMED$")
+	public void the_transport_status_of_the_cargo_is_CLAIMED() throws Throwable {
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.CLAIMED.getCode()));
 	}
 
 	@Override

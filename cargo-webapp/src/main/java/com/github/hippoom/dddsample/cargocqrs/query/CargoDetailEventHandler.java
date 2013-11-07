@@ -6,8 +6,12 @@ import org.axonframework.eventhandling.annotation.EventHandler;
 
 import com.github.hippoom.dddsample.cargocqrs.core.TransportStatus;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoCurrentVoyageUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoIsUnloadedAtDestinationEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoLastKnownLocationUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoTransportStatusRecalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.NextExpectedHandlingActivityCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.persistence.CargoDetailDao;
 import com.github.hippoom.dddsample.cargocqrs.rest.CargoDto;
@@ -43,6 +47,36 @@ public class CargoDetailEventHandler {
 		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
 		cargo.setNextExpectedHandlingActivityType(event.getType());
 		cargo.setNextExpectedHandlingActivityLocation(event.getLocation());
+		cargo.setNextExpectedHandlingActivityVoyageNumber(event
+				.getVoyageNumber());
+		cargoDetailDao.store(cargo);
+	}
+
+	@EventHandler
+	public void on(CargoTransportStatusRecalculatedEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setTransportStatus(event.getTransportStatus());
+		cargoDetailDao.store(cargo);
+	}
+
+	@EventHandler
+	public void on(CargoLastKnownLocationUpdatedEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setLastKnownLocation(event.getLocation());
+		cargoDetailDao.store(cargo);
+	}
+
+	@EventHandler
+	public void on(CargoCurrentVoyageUpdatedEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setCurrentVoyageNumber(event.getVoyageNumber());
+		cargoDetailDao.store(cargo);
+	}
+
+	@EventHandler
+	public void on(CargoIsUnloadedAtDestinationEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setUnloadedAtDestinationIndicator("1");
 		cargoDetailDao.store(cargo);
 	}
 
