@@ -34,6 +34,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
 import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoLastKnownLocationUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoTransportStatusRecalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.HandlingEventRegisteredEvent;
@@ -166,6 +167,7 @@ public class CargoCommandHandlerUnitTests {
 		final UnLocode pek = new UnLocode("CNPEK");
 		final Date loadTime = new DateTime().withDate(2015, 4, 1).toDate();
 		final Date unloadTime = new DateTime().withDate(2015, 4, 7).toDate();
+		final VoyageNumber cm001 = new VoyageNumber("CM001");
 
 		final Date registrationTime = new DateTime().withDate(2015, 4, 2)
 				.toDate();
@@ -192,7 +194,10 @@ public class CargoCommandHandlerUnitTests {
 								trackingId, sha, HandlingType.RECEIVE,
 								registrationTime),
 						new CargoTransportStatusRecalculatedEvent(trackingId,
-								TransportStatus.IN_PORT));
+								TransportStatus.IN_PORT),
+						new CargoLastKnownLocationUpdatedEvent(trackingId, sha),
+						new NextExpectedHandlingActivityCalculatedEvent(
+								trackingId, HandlingType.LOAD, cm001, sha));
 
 	}
 }

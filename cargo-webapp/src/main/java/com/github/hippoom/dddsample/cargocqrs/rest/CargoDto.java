@@ -60,6 +60,12 @@ public class CargoDto {
 	@Column(name = "ne_ha_location")
 	private String nextExpectedHandlingActivityLocation;
 
+	@Column(name = "ne_ha_voyage")
+	private String nextExpectedHandlingActivityVoyageNumber;
+
+	@Column(name = "last_known_location")
+	private String lastKnownLocation;
+
 	@ElementCollection
 	@CollectionTable(name = "t_cargo_leg_detail", joinColumns = @JoinColumn(name = "tracking_id"))
 	@OrderBy("index")

@@ -73,6 +73,8 @@ public class CargoAdminSteps implements ApplicationContextAware {
 
 	private List<RouteCandidateDto> routeCandidates;
 
+	private RegisterHandlingEventRequest request;
+
 	@When("^I fill the form with origin, destination and arrival deadline$")
 	public void I_fill_the_form_with_origin_destination_and_arrival_deadline()
 			throws Throwable {
@@ -232,8 +234,8 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		this.cargo = findCargoBy(trackingId);
 	}
 
-	@When("^I register a new handling event of which type is load$")
-	public void I_register_a_new_handling_event_of_which_type_is_load()
+	@When("^I register a new handling event of which type is RECEIVE$")
+	public void I_register_a_new_handling_event_of_which_type_is_RECEIVE()
 			throws Throwable {
 		mockMvc()
 				.perform(
@@ -248,7 +250,7 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		// objectMapper.setDateFormat(new
 		// SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
-		RegisterHandlingEventRequest request = new RegisterHandlingEventRequest();
+		request = new RegisterHandlingEventRequest();
 		request.setTrackingId(cargo.getTrackingId());
 		request.setHandlingType(cargo.getNextExpectedHandlingActivityType());
 		request.setLocation(cargo.getNextExpectedHandlingActivityLocation());
@@ -258,9 +260,9 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		return objectMapper.writeValueAsBytes(request);
 	}
 
-	@Then("^the transporting status of the cargo is IN_PORT$")
-	public void the_transporting_status_of_the_cargo_is_IN_PORT()
-			throws Throwable {
+	@Then("^the transport status of the cargo is IN_PORT$")
+	public void the_transport_status_of_the_cargo_is_IN_PORT() throws Throwable {
+
 		assertThat(cargo.getTransportStatus(),
 				equalTo(TransportStatus.IN_PORT.getCode()));
 	}
@@ -268,22 +270,25 @@ public class CargoAdminSteps implements ApplicationContextAware {
 	@Then("^the last known location of the cargo is updated as the location of the handling event$")
 	public void the_last_known_location_of_the_cargo_is_updated_as_the_location_of_the_handling_event()
 			throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.IN_PORT.getCode()));
 	}
 
 	@Then("^the current voyage of the cargo is updated as the voyage of the handling event$")
 	public void the_current_voyage_of_the_cargo_is_updated_as_the_voyage_of_the_handling_event()
 			throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
+		assertThat(cargo.getLastKnownLocation(), equalTo(request.getLocation()));
 	}
 
-	@Then("^the next expected handling activity is being shipped by the leg's voyage and unloading$")
-	public void the_next_expected_handling_activity_is_being_shipped_by_the_leg_s_voyage_and_unloading()
+	@Then("^the next expected handling activity is being loaded to the leg's voyage$")
+	public void the_next_expected_handling_activity_is_being_loaded_to_the_legs_voyage()
 			throws Throwable {
-		// Express the Regexp above with the code you wish you had
-		throw new PendingException();
+		assertThat(cargo.getNextExpectedHandlingActivityLocation(),
+				equalTo(cargo.getLegs().get(0).getFrom()));
+		assertThat(cargo.getNextExpectedHandlingActivityVoyageNumber(),
+				equalTo(cargo.getLegs().get(0).getVoyageNumber()));
+		assertThat(cargo.getNextExpectedHandlingActivityType(),
+				equalTo(HandlingType.LOAD.getCode()));
 	}
 
 	@Override
