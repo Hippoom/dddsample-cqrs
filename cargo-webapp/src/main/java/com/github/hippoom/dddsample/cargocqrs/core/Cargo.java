@@ -88,8 +88,10 @@ public class Cargo extends AbstractAnnotatedAggregateRoot<TrackingId> {
 			apply(new CargoCurrentVoyageUpdatedEvent(this.trackingId,
 					delivery.currentVoyage()));
 		}
-		apply(new NextExpectedHandlingActivityCalculatedEvent(this.trackingId,
-				delivery.nextExpectedHandlingActivity()));
+		if (delivery.nextExpectedHandlingActivity() != null) {
+			apply(new NextExpectedHandlingActivityCalculatedEvent(
+					this.trackingId, delivery.nextExpectedHandlingActivity()));
+		}
 		if (delivery.isUnloadedAtDestination()) {
 			apply(new CargoIsUnloadedAtDestinationEvent(this.trackingId));
 		}

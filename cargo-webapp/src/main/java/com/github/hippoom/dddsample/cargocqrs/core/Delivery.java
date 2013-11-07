@@ -164,6 +164,8 @@ public class Delivery {
 			return TransportStatus.ONBOARD_CARRIER;
 		case UNLOAD:
 			return TransportStatus.IN_PORT;
+		case CLAIM:
+			return TransportStatus.CLAIMED;
 		default:
 			return TransportStatus.UNKNOWN;
 		}

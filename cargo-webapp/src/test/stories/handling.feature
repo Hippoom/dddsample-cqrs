@@ -37,3 +37,10 @@ When I register the last handling event of which type is UNLOAD
 Then the transport status of the cargo is IN_PORT
 And the cargo is unloaded at the destination
 And the next expected handling activity is claimed at the destination
+
+Scenario: Operator registers a handling event of which type is CLAIM
+
+Given a cargo has been routed
+And the cargo has been unloaded at the destination
+When I register a handling event of which type is CLAIM
+Then the transport status of the cargo is CLAIMED

@@ -348,6 +348,16 @@ public class CargoAdminSteps implements ApplicationContextAware {
 		return request;
 	}
 
+	private RegisterHandlingEventRequest claimedHandlingEventOf(CargoDto cargo) {
+		request = new RegisterHandlingEventRequest();
+		LegDto firstLeg = cargo.getLegs().get(1);
+		request.setCompletionTime(firstLeg.getUnloadTime());
+		request.setHandlingType(HandlingType.CLAIM.getCode());
+		request.setLocation(firstLeg.getTo());
+		request.setTrackingId(cargo.getTrackingId());
+		return request;
+	}
+
 	@When("^I register a new handling event of which type is LOAD$")
 	public void I_register_a_new_handling_event_of_which_type_is_LOAD()
 			throws Throwable {
@@ -415,6 +425,26 @@ public class CargoAdminSteps implements ApplicationContextAware {
 	@Then("^the cargo is unloaded at the destination$")
 	public void the_cargo_is_unloaded_at_the_destination() throws Throwable {
 		assertThat(cargo.getUnloadedAtDestinationIndicator(), equalTo("1"));
+	}
+
+	@Given("^the cargo has been unloaded at the destination$")
+	public void the_cargo_has_been_unloaded_at_the_destination()
+			throws Throwable {
+		I_register_a_new_handling_event_of_which_type_is_RECEIVE();
+		I_register_the_last_handling_event_of_which_type_is_UNLOAD();
+	}
+
+	@When("^I register a handling event of which type is CLAIM$")
+	public void I_register_a_handling_event_of_which_type_is_CLAIM()
+			throws Throwable {
+		registerHandlingEvent(claimedHandlingEventOf(cargo));
+		this.cargo = findCargoBy(trackingId);
+	}
+
+	@Then("^the transport status of the cargo is CLAIMED$")
+	public void the_transport_status_of_the_cargo_is_CLAIMED() throws Throwable {
+		assertThat(cargo.getTransportStatus(),
+				equalTo(TransportStatus.CLAIMED.getCode()));
 	}
 
 	@Override

@@ -126,4 +126,30 @@ public class DeliveryUnitTests {
 				equalTo(new HandlingActivity(HandlingType.CLAIM, pek, null)));
 		assertThat(delivery.isUnloadedAtDestination(), is(true));
 	}
+
+	@Test
+	public void givenTheClaimedHandlingEvent() throws Throwable {
+
+		final RouteSpecification routeSpecification = new RouteSpecification(
+				sha, pek, new DateTime().withDate(2014, 4, 7)
+						.withTimeAtStartOfDay().toDate());
+		final Date unloadTime = new DateTime().withDate(2014, 4, 3)
+				.withTimeAtStartOfDay().toDate();
+		final Itinerary itinerary = new Itinerary(new Leg(cm001, sha, pek,
+				new DateTime().withDate(2014, 4, 3).withTimeAtStartOfDay()
+						.toDate(), unloadTime));
+		final HandlingEvent handlingEvent = new HandlingEvent(
+				new HandlingActivity(HandlingType.CLAIM, pek, null),
+				unloadTime, new Date());
+
+		Delivery delivery = Delivery.derivedFrom(routeSpecification, itinerary,
+				handlingEvent);
+
+		assertThat(delivery.routingStatus(), equalTo(RoutingStatus.ROUTED));
+		assertThat(delivery.transportStatus(), equalTo(TransportStatus.CLAIMED));
+		assertThat(delivery.lastKnownLocation(), equalTo(pek));
+		assertThat(delivery.currentVoyage(), is(nullValue()));
+		assertThat(delivery.nextExpectedHandlingActivity(), is(nullValue()));
+		assertThat(delivery.isUnloadedAtDestination(), is(false));
+	}
 }
