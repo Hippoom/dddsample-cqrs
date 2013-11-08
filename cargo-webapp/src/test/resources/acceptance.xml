@@ -14,4 +14,7 @@
 	<import resource="file:src/main/webapp/WEB-INF/booking-servlet.xml" />
 	<import resource="classpath:root.xml" />
 
+	<bean class="com.github.hippoom.dddsample.cargocqrs.acceptance.CargoContext"
+		scope="prototype" />
+
 </beans>
