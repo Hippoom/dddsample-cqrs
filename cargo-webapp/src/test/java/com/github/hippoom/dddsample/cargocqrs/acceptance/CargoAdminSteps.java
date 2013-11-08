@@ -118,11 +118,6 @@ public class CargoAdminSteps {
 		assertThat(context.currentTrackingId(), not(nullValue()));
 	}
 
-	@Given("^a cargo has been registered$")
-	public void a_cargo_has_been_registered() throws Throwable {
-		this.context.saveCurrentTrackingId(aNewCargoIsRegistered());
-	}
-
 	@Given("^I request possible routes for the cargo$")
 	public void I_request_possible_routes_for_the_cargo() throws Throwable {
 
