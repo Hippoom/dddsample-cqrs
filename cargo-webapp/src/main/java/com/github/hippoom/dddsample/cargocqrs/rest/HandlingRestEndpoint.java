@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,7 @@ import com.github.hippoom.dddsample.cargocqrs.application.HandlingApplication;
 import com.github.hippoom.dddsample.cargocqrs.core.HandlingType;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
+import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 
 @Slf4j
 @Controller
@@ -32,7 +34,12 @@ public class HandlingRestEndpoint {
 		handingApplication.registerHandlingEvent(request.getCompletionTime(),
 				TrackingId.of(request.getTrackingId()),
 				new UnLocode(request.getLocation()),
-				HandlingType.of(request.getHandlingType()));
+				HandlingType.of(request.getHandlingType()),
+				voyage(request.getVoyageNumber()));
+	}
+
+	private VoyageNumber voyage(String number) {
+		return StringUtils.isNotBlank(number) ? new VoyageNumber(number) : null;
 	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)

@@ -188,7 +188,8 @@ public class CargoCommandHandlerUnitTests {
 				new NextExpectedHandlingActivityCalculatedEvent(trackingId,
 						HandlingType.RECEIVE, null, sha))
 				.when(new RegisterHandlingEventCommand(completionTime,
-						trackingId, sha, HandlingType.RECEIVE, registrationTime))
+						trackingId, sha, HandlingType.RECEIVE, cm001,
+						registrationTime))
 				.expectEvents(
 						new HandlingEventRegisteredEvent(completionTime,
 								trackingId, sha, HandlingType.RECEIVE,

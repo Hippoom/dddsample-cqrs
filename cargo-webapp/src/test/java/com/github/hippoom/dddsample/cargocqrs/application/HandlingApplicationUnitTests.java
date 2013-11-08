@@ -14,6 +14,7 @@ import com.github.hippoom.dddsample.cargocqrs.command.RegisterHandlingEventComma
 import com.github.hippoom.dddsample.cargocqrs.core.HandlingType;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
+import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 import com.github.hippoom.dddsample.cargocqrs.time.Clock;
 
 public class HandlingApplicationUnitTests {
@@ -43,6 +44,7 @@ public class HandlingApplicationUnitTests {
 		final UnLocode location = new UnLocode("CNSHA");
 		final HandlingType type = HandlingType.RECEIVE;
 		final Date registrationTime = new Date();
+		final VoyageNumber voyageNumber = new VoyageNumber("CM001");
 
 		context.checking(new Expectations() {
 			{
@@ -51,10 +53,12 @@ public class HandlingApplicationUnitTests {
 
 				oneOf(commandGateway).sendAndWait(
 						new RegisterHandlingEventCommand(completionTime,
-								trackingId, location, type, registrationTime));
+								trackingId, location, type, voyageNumber,
+								registrationTime));
 			}
 		});
 
-		target.registerHandlingEvent(completionTime, trackingId, location, type);
+		target.registerHandlingEvent(completionTime, trackingId, location,
+				type, voyageNumber);
 	}
 }

@@ -7,7 +7,7 @@ import cucumber.api.junit.Cucumber;
 @RunWith(Cucumber.class)
 @Cucumber.Options(features = { "classpath:" }, format = {
 		"html:target/acceptance-cucumber-html",
-		"json:target/acceptance-cucumber-json" }, name = "Operator registers a handling event of which type is CLAIM")
+		"json:target/acceptance-cucumber-json" }, name = "Operator registers a RECEIVE handling event")
 public class SpecificAcceptanceTests {
 
 }

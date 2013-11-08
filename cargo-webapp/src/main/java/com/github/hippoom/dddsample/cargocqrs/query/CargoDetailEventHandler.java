@@ -8,6 +8,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.TransportStatus;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoCurrentVoyageUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoIsClaimedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoIsUnloadedAtDestinationEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoLastKnownLocationUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
@@ -77,6 +78,15 @@ public class CargoDetailEventHandler {
 	public void on(CargoIsUnloadedAtDestinationEvent event) {
 		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
 		cargo.setUnloadedAtDestinationIndicator("1");
+		cargoDetailDao.store(cargo);
+	}
+
+	@EventHandler
+	public void on(CargoIsClaimedEvent event) {
+		final CargoDto cargo = cargoDetailDao.findBy(event.getTrackingId());
+		cargo.setNextExpectedHandlingActivityType(null);
+		cargo.setNextExpectedHandlingActivityLocation(null);
+		cargo.setNextExpectedHandlingActivityVoyageNumber(null);
 		cargoDetailDao.store(cargo);
 	}
 
