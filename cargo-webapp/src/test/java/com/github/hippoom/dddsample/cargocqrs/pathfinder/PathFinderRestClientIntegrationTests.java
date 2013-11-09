@@ -53,7 +53,12 @@ public class PathFinderRestClientIntegrationTests {
 		HttpServer server = httpserver(configurations.getPathfinderPort());
 		server.get(
 				and(by(uri(configurations.getPathFInderRoutesPath())),
-						eq(query("spec"), json(routeSpec)))).response("foo");
+						eq(query("origin"), routeSpec.getOrigin().getUnlocode()),
+						eq(query("destination"), routeSpec.getDestination()
+								.getUnlocode()),
+						eq(query("arrivalDeadline"), new SimpleDateFormat(
+								"yyyy-MM-dd").format(routeSpec
+								.getArrivalDeadline())))).response("foo");
 
 		running(server, new Runnable() {
 			@Override
@@ -66,13 +71,4 @@ public class PathFinderRestClientIntegrationTests {
 
 	}
 
-	private String json(RouteSpecification routeSpec) {
-		return "{\"origin\":\""
-				+ routeSpec.getOrigin().getUnlocode()
-				+ "\", \"destination\":\""
-				+ routeSpec.getDestination().getUnlocode()
-				+ "\", \"arrivalDeadline\":\""
-				+ new SimpleDateFormat("yyyy-MM-dd").format(routeSpec
-						.getArrivalDeadline()) + "\"}";
-	}
 }

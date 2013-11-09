@@ -126,9 +126,10 @@ public class HandlingSteps {
 		HttpServer server = httpserver(10001);
 		server.get(
 				and(by(uri("/pathfinder/shortestPath")),
-						eq(query("spec"),
-								json("classpath:acceptance_route_specification.json"))))
-				.response(json("classpath:acceptance_pathfinder_stub.json"));
+						eq(query("origin"), "CNSHA"),
+						eq(query("destination"), "CNPEK"),
+						eq(query("arrivalDeadline"), "2014-04-07"))).response(
+				json("classpath:acceptance_pathfinder_stub.json"));
 
 		moco = new MocoHttpServer((ActualHttpServer) server);
 		moco.start();

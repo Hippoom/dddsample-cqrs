@@ -6,17 +6,17 @@ import com.github.hippoom.dddsample.cargocqrs.core.RouteSpecification;
 
 public class FetchRouteRequestTranslator {
 
-	public String from(RouteSpecification routeSpec) {
-		return json(routeSpec);
+	public String origin(RouteSpecification routeSpec) {
+		return routeSpec.getOrigin().getUnlocode();
 	}
 
-	private String json(RouteSpecification routeSpec) {
-		return "{\"origin\":\""
-				+ routeSpec.getOrigin().getUnlocode()
-				+ "\", \"destination\":\""
-				+ routeSpec.getDestination().getUnlocode()
-				+ "\", \"arrivalDeadline\":\""
-				+ new SimpleDateFormat("yyyy-MM-dd").format(routeSpec
-						.getArrivalDeadline()) + "\"}";
+	public String destination(RouteSpecification routeSpec) {
+		return routeSpec.getDestination().getUnlocode();
 	}
+
+	public String arrivalDeadline(RouteSpecification routeSpec) {
+		return new SimpleDateFormat("yyyy-MM-dd").format(routeSpec
+				.getArrivalDeadline());
+	}
+
 }
