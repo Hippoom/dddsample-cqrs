@@ -6,6 +6,11 @@ import static com.github.dreamhead.moco.Moco.eq;
 import static com.github.dreamhead.moco.Moco.httpserver;
 import static com.github.dreamhead.moco.Moco.query;
 import static com.github.dreamhead.moco.Moco.uri;
+import static com.github.hippoom.dddsample.cargocqrs.acceptance.CargoAssertions.at;
+import static com.github.hippoom.dddsample.cargocqrs.acceptance.CargoAssertions.shouldBe;
+import static com.github.hippoom.dddsample.cargocqrs.acceptance.CargoAssertions.theNextExpectedHandlingActivityOf;
+import static com.github.hippoom.dddsample.cargocqrs.acceptance.CargoAssertions.theRoutingStatusOf;
+import static com.github.hippoom.dddsample.cargocqrs.acceptance.CargoAssertions.theTransportStatusOf;
 import static com.github.hippoom.dddsample.cargocqrs.core.HandlingType.RECEIVE;
 import static com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus.NOT_ROUTED;
 import static com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus.ROUTED;
@@ -13,43 +18,29 @@ import static com.github.hippoom.dddsample.cargocqrs.core.TransportStatus.NOT_RE
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dreamhead.moco.HttpServer;
 import com.github.dreamhead.moco.internal.ActualHttpServer;
 import com.github.dreamhead.moco.internal.MocoHttpServer;
 import com.github.hippoom.dddsample.cargocqrs.config.Configurations;
-import com.github.hippoom.dddsample.cargocqrs.core.HandlingType;
-import com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus;
-import com.github.hippoom.dddsample.cargocqrs.core.TransportStatus;
 import com.github.hippoom.dddsample.cargocqrs.rest.LegDto;
-import com.github.hippoom.dddsample.cargocqrs.rest.RegisterCargoRequest;
-import com.github.hippoom.dddsample.cargocqrs.rest.RouteCandidateDto;
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -70,16 +61,19 @@ public class CargoAdminSteps {
 
 	private ResultActions cargo;
 
+	private ResultActions routeCandidates;
+
+	/* test data starts */
 	private String origin = "CNSHA";
 
 	private String destination = "CNPEK";
 
+	private Date arrivalDeadline = aWeekLater();
+
 	private LegDto leg = new LegDto(0, "CM001", origin, destination,
 			tommorrow(), twoDaysLater());
 
-	private Date arrivalDeadline = aWeekLater();
-
-	private ResultActions routeCandidates;
+	/* test data ends */
 
 	@When("^I fill the form with origin, destination and arrival deadline$")
 	public void I_fill_the_form_with_origin_destination_and_arrival_deadline()
@@ -95,13 +89,13 @@ public class CargoAdminSteps {
 
 	@Then("^the cargo is not routed$")
 	public void the_cargo_is_not_routed() throws Throwable {
-		theRoutingStatusShouldBe(NOT_ROUTED);
+		theRoutingStatusOf(cargo, shouldBe(NOT_ROUTED));
 	}
 
 	@Then("^the transport status of the cargo is NOT_RECEIVED$")
 	public void the_transport_status_of_the_cargo_is_NOT_RECEIVED()
 			throws Throwable {
-		theTransportStatusIs(NOT_RECEIVED);
+		theTransportStatusOf(cargo, shouldBe(NOT_RECEIVED));
 	}
 
 	@Given("^I request possible routes for the cargo$")
@@ -143,7 +137,7 @@ public class CargoAdminSteps {
 
 	@Then("^the cargo is routed$")
 	public void the_cargo_is_routed() throws Throwable {
-		theRoutingStatusShouldBe(ROUTED);
+		theRoutingStatusOf(cargo, shouldBe(ROUTED));
 	}
 
 	@Then("^the estimated time of arrival equals to the last unloaded time of the route$")
@@ -156,75 +150,33 @@ public class CargoAdminSteps {
 	@Then("^the next expected handling activity is being received at the origin of the route specification$")
 	public void the_next_expected_handling_activity_is_being_received_at_the_origin_of_the_route_specification()
 			throws Throwable {
-		theNextExpectedHandlingActivityIs(RECEIVE, origin);
-	}
-
-	private void theNextExpectedHandlingActivityIs(HandlingType type,
-			String location) throws Exception {
-		cargo.andExpect(jsonPath("nextExpectedHandlingActivityType").value(
-				type.getCode()));
-		cargo.andExpect(jsonPath("nextExpectedHandlingActivityLocation").value(
-				location));
+		theNextExpectedHandlingActivityOf(cargo, shouldBe(RECEIVE), at(origin));
 	}
 
 	private ResultActions assignCargoToRoute(LegDto... legs) throws Exception,
 			JsonProcessingException {
-		return mockMvc().perform(
-				post("/cargo/" + currentTrackingId()).content(
-						json(new RouteCandidateDto(legs))).contentType(
-						MediaType.APPLICATION_JSON)).andDo(print());
+		return new CargoFixture(this.wac).assignCargoToRoute(trackingId, legs);
 	}
 
 	private ResultActions findCargoBy(String trackingId) throws Exception {
-		return mockMvc().perform(get("/cargo/" + currentTrackingId()))
-				.andDo(print()).andExpect(status().isOk());
+		return new CargoFixture(this.wac).findCargoBy(trackingId);
 
 	}
 
 	private String aNewCargoIsRegistered() throws Exception {
-		return mockMvc()
-				.perform(
-						put("/cargo").content(
-								json(new RegisterCargoRequest(origin,
-										destination, arrivalDeadline)))
-								.contentType(MediaType.APPLICATION_JSON))
-				.andDo(print()).andExpect(status().isOk()).andReturn()
-				.getResponse().getContentAsString();
+		return new CargoFixture(this.wac).aNewCargoIsRegisteredWith(origin,
+				destination, arrivalDeadline);
 
 	}
 
 	private ResultActions requestPossibleRoutes() throws Exception {
-		return mockMvc().perform(get("/routes/" + currentTrackingId())).andDo(
-				print());
-	}
-
-	private String currentTrackingId() {
-		return this.trackingId;
+		return new CargoFixture(this.wac).requestPossibleRoutesFor(trackingId);
 	}
 
 	private String json(String file) throws JsonParseException,
 			JsonMappingException, IOException {
 		return new String(IOUtils.toByteArray(wac.getResource(file)
 				.getInputStream()), "UTF-8");
-	}
-
-	private String json(Object object) throws JsonProcessingException,
-			UnsupportedEncodingException {
-		return new String(new ObjectMapper().writeValueAsBytes(object), "UTF-8");
-	}
-
-	private MockMvc mockMvc() {
-		return webAppContextSetup(this.wac).build();
-	}
-
-	private void theRoutingStatusShouldBe(RoutingStatus expected)
-			throws Exception {
-		cargo.andExpect(jsonPath("routingStatus").value(expected.getCode()));
-	}
-
-	private void theTransportStatusIs(TransportStatus expected)
-			throws Exception {
-		cargo.andExpect(jsonPath("transportStatus").value(expected.getCode()));
 	}
 
 	private Date aWeekLater() {

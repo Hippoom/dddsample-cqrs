@@ -26,7 +26,7 @@ Scenario: Operator registers the first expected 'UNLOAD' handling event
 
 Given a cargo is assigned to an itinerary with multiple legs
 And the cargo arrives at the destination of the first leg 
-When I register an 'UNLOAD' handling event
+When I register an 'UNLOAD' handling event for the first leg
 Then the transport status of the cargo is marked as IN_PORT
 And the last known location of the cargo is updated
 And the cargo is marked as not currently on any voyage
@@ -35,7 +35,7 @@ And the next expected handling activity is calculated as loaded onto the next le
 Scenario: Operator registers the last expected 'UNLOAD' handling event
 
 Given a cargo arrives at the final destination
-When I register an 'UNLOAD' handling event
+When I register an 'UNLOAD' handling event for the last leg
 Then the transport status of the cargo is marked as IN_PORT
 And the last known location of the cargo is updated
 And the cargo is marked as not currently on any voyage

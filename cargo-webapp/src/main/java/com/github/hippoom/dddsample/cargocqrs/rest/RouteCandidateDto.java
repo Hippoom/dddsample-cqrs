@@ -24,7 +24,7 @@ public class RouteCandidateDto {
 		this.legs = legs;
 	}
 
-	public RouteCandidateDto(final LegDto[] legs) {
+	public RouteCandidateDto(final LegDto... legs) {
 		this.legs = Arrays.asList(legs);
 	}
 
