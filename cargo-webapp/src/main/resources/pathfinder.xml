@@ -17,21 +17,21 @@
 
 	<int:channel id="fetchRoutesForSpecificationInputChannel" />
 
-	<int:transformer id="fetchRoutesRequestTranslator"
-		input-channel="fetchRoutesForSpecificationInputChannel"
-		output-channel="fetchRoutesFromPathFindInputChannel">
-		<bean
-			class="com.github.hippoom.dddsample.cargocqrs.pathfinder.FetchRouteRequestTranslator" />
-	</int:transformer>
+	<bean id="fetchRouteRequestTranslator"
+		class="com.github.hippoom.dddsample.cargocqrs.pathfinder.FetchRouteRequestTranslator" />
 
-	<int:channel id="fetchRoutesFromPathFindInputChannel" />
 
 	<int-http:outbound-gateway id="pathFinderRestClient"
-		url-expression="'#{configurations.getPathFInderRoutesUrl()}' + '?spec={spec}'"
+		url-expression="'#{configurations.getPathFInderRoutesUrl()}' + '?origin={origin}&amp;destination={destination}&amp;arrivalDeadline={arrivalDeadline}'"
 		http-method="GET" message-converters="stringHttpMessageConverter"
-		expected-response-type="java.lang.String" request-channel="fetchRoutesFromPathFindInputChannel"
+		expected-response-type="java.lang.String" request-channel="fetchRoutesForSpecificationInputChannel"
 		reply-channel="translateItinerariesInputChannel">
-		<int-http:uri-variable name="spec" expression="payload" />
+		<int-http:uri-variable name="origin"
+			expression="@fetchRouteRequestTranslator.origin(payload)" />
+		<int-http:uri-variable name="destination"
+			expression="@fetchRouteRequestTranslator.destination(payload)" />
+		<int-http:uri-variable name="arrivalDeadline"
+			expression="@fetchRouteRequestTranslator.arrivalDeadline(payload)" />
 	</int-http:outbound-gateway>
 
 	<bean id="stringHttpMessageConverter"

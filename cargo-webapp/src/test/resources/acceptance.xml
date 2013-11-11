@@ -14,4 +14,5 @@
 	<import resource="file:src/main/webapp/WEB-INF/booking-servlet.xml" />
 	<import resource="classpath:root.xml" />
 
+
 </beans>

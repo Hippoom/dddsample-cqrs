@@ -12,4 +12,16 @@ public class RegisterHandlingEventRequest {
 	private String voyageNumber;
 	private Date completionTime;
 
+	public RegisterHandlingEventRequest(String trackingId, String handlingType,
+			String location, String voyageNumber, Date completionTime) {
+		this.trackingId = trackingId;
+		this.handlingType = handlingType;
+		this.location = location;
+		this.voyageNumber = voyageNumber;
+		this.completionTime = completionTime;
+	}
+
+	public RegisterHandlingEventRequest() {
+	}
+
 }

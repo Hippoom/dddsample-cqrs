@@ -1,5 +1,6 @@
 package com.github.hippoom.dddsample.cargocqrs.rest;
 
+import java.util.Arrays;
 import java.util.List;
 
 import lombok.Data;
@@ -21,6 +22,10 @@ public class RouteCandidateDto {
 	 */
 	public RouteCandidateDto(final List<LegDto> legs) {
 		this.legs = legs;
+	}
+
+	public RouteCandidateDto(final LegDto... legs) {
+		this.legs = Arrays.asList(legs);
 	}
 
 	/**

@@ -11,6 +11,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.HandlingEvent;
 import com.github.hippoom.dddsample.cargocqrs.core.HandlingType;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
+import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 
 @EqualsAndHashCode
 @ToString
@@ -19,21 +20,23 @@ public class RegisterHandlingEventCommand {
 	private final Date completionTime;
 	private final TrackingId trackingId;
 	private final UnLocode location;
+	private final VoyageNumber voyageNumber;
 	private final HandlingType type;
 	private final Date registrationTime;
 
 	public RegisterHandlingEventCommand(Date completionTime,
 			TrackingId trackingId, UnLocode location, HandlingType type,
-			Date registrationTime) {
+			VoyageNumber voyageNumber, Date registrationTime) {
 		this.completionTime = completionTime;
 		this.trackingId = trackingId;
 		this.location = location;
 		this.type = type;
+		this.voyageNumber = voyageNumber;
 		this.registrationTime = registrationTime;
 	}
 
 	public HandlingEvent handlingEvent() {
-		return new HandlingEvent(new HandlingActivity(type, location),
-				completionTime, registrationTime);
+		return new HandlingEvent(new HandlingActivity(type, location,
+				voyageNumber), completionTime, registrationTime);
 	}
 }

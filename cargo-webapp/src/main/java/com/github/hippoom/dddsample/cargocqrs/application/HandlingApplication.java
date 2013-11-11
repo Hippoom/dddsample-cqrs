@@ -9,6 +9,7 @@ import com.github.hippoom.dddsample.cargocqrs.command.RegisterHandlingEventComma
 import com.github.hippoom.dddsample.cargocqrs.core.HandlingType;
 import com.github.hippoom.dddsample.cargocqrs.core.TrackingId;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
+import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 import com.github.hippoom.dddsample.cargocqrs.time.Clock;
 
 /**
@@ -36,8 +37,10 @@ public class HandlingApplication {
 	 *            type of event
 	 */
 	public void registerHandlingEvent(Date completionTime,
-			TrackingId trackingId, UnLocode location, HandlingType type) {
+			TrackingId trackingId, UnLocode location, HandlingType type,
+			VoyageNumber voyageNumber) {
 		commandGateway.sendAndWait(new RegisterHandlingEventCommand(
-				completionTime, trackingId, location, type, clock.now()));
+				completionTime, trackingId, location, type, voyageNumber, clock
+						.now()));
 	}
 }
