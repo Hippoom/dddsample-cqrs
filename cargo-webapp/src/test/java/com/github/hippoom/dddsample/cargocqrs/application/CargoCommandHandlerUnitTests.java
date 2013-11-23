@@ -1,5 +1,11 @@
 package com.github.hippoom.dddsample.cargocqrs.application;
 
+import static com.github.hippoom.dddsample.cargocqrs.core.HandlingType.RECEIVE;
+import static com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus.NOT_ROUTED;
+import static com.github.hippoom.dddsample.cargocqrs.core.RoutingStatus.ROUTED;
+import static com.github.hippoom.dddsample.cargocqrs.core.UnLocodes.CNPEK;
+import static com.github.hippoom.dddsample.cargocqrs.core.UnLocodes.CNSHA;
+import static com.github.hippoom.dddsample.cargocqrs.core.VoyageNumbers.CM001;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
@@ -33,6 +39,7 @@ import com.github.hippoom.dddsample.cargocqrs.core.TransportStatus;
 import com.github.hippoom.dddsample.cargocqrs.core.UnLocode;
 import com.github.hippoom.dddsample.cargocqrs.core.VoyageNumber;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoAssignedEvent;
+import com.github.hippoom.dddsample.cargocqrs.event.CargoCurrentVoyageUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoEtaCalculatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoLastKnownLocationUpdatedEvent;
 import com.github.hippoom.dddsample.cargocqrs.event.CargoRegisteredEvent;
@@ -63,20 +70,14 @@ public class CargoCommandHandlerUnitTests {
 	@Before
 	public void injects() throws Throwable {
 		fixture.registerAnnotatedCommandHandler(target);
-
 		target.setCargoRepository(cargoRepository);
-
 		cargoRepository.setIdentifierGenerator(trackingIdGenerator);
 		cargoRepository.setDelegate(fixture.getRepository());
-
 	}
 
 	@Test
 	public void storesNewCargo() throws Throwable {
-		final UnLocode originUnLocode = new UnLocode("CNSHA");
-		final UnLocode destinationUnLocode = new UnLocode("CNPEK");
 		final Date arrivalDeadline = new Date();
-
 		final TrackingId trackingId = new TrackingId("1");
 
 		context.checking(new Expectations() {
@@ -88,13 +89,11 @@ public class CargoCommandHandlerUnitTests {
 		});
 
 		fixture.given()
-				.when(new RegisterCargoCommand(originUnLocode,
-						destinationUnLocode, arrivalDeadline))
+				.when(new RegisterCargoCommand(CNSHA, CNPEK, arrivalDeadline))
 				.expectEvents(
-						new CargoRegisteredEvent(trackingId.getValue(),
-								originUnLocode.getUnlocode(),
-								destinationUnLocode.getUnlocode(),
-								arrivalDeadline, RoutingStatus.NOT_ROUTED))
+						new CargoRegisteredEvent(trackingId.getValue(), CNSHA
+								.getUnlocode(), CNPEK.getUnlocode(),
+								arrivalDeadline, NOT_ROUTED))
 				.expectReturnValue(trackingId);
 
 	}
@@ -103,30 +102,25 @@ public class CargoCommandHandlerUnitTests {
 	public void assignsCargoToRoute() throws Throwable {
 		final TrackingId trackingId = new TrackingId("1");
 
-		final UnLocode sha = new UnLocode("CNSHA");
-		final UnLocode pek = new UnLocode("CNPEK");
 		final Date loadTime = new DateTime().withDate(2015, 4, 1).toDate();
 		final Date unloadTime = new DateTime().withDate(2015, 4, 7).toDate();
-		final VoyageNumber voyageNumber = new VoyageNumber("CM001");
 
-		final Itinerary itinerary = new Itinerary(new Leg(voyageNumber, sha,
-				pek, loadTime, unloadTime));
+		final Itinerary itinerary = new Itinerary(new Leg(CM001, CNSHA, CNPEK,
+				loadTime, unloadTime));
 
 		fixture.given(
-				new CargoRegisteredEvent(trackingId.getValue(), sha
-						.getUnlocode(), pek.getUnlocode(), new DateTime()
-						.withDate(2015, 4, 8).toDate(),
-						RoutingStatus.NOT_ROUTED))
+				new CargoRegisteredEvent(trackingId.getValue(), CNSHA
+						.getUnlocode(), CNPEK.getUnlocode(), new DateTime()
+						.withDate(2015, 4, 8).toDate(), NOT_ROUTED))
 				.when(new AssignCargoToRouteCommand(trackingId, itinerary))
 				.expectEvents(
 						new CargoAssignedEvent(trackingId.getValue(),
 								new RouteCandidateDto(Arrays.asList(new LegDto(
 										0, "CM001", "CNSHA", "CNPEK", loadTime,
-										unloadTime))),
-								RoutingStatus.ROUTED.getCode()),
+										unloadTime))), ROUTED.getCode()),
 						new CargoEtaCalculatedEvent(trackingId, unloadTime),
 						new NextExpectedHandlingActivityCalculatedEvent(
-								trackingId, HandlingType.RECEIVE, null, sha));
+								trackingId, RECEIVE, VoyageNumber.none(), CNSHA));
 
 	}
 
@@ -197,6 +191,7 @@ public class CargoCommandHandlerUnitTests {
 						new CargoTransportStatusRecalculatedEvent(trackingId,
 								TransportStatus.IN_PORT),
 						new CargoLastKnownLocationUpdatedEvent(trackingId, sha),
+						new CargoCurrentVoyageUpdatedEvent(trackingId, VoyageNumber.none()),
 						new NextExpectedHandlingActivityCalculatedEvent(
 								trackingId, HandlingType.LOAD, cm001, sha));
 

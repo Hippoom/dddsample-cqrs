@@ -20,14 +20,15 @@ public class HandlingActivity {
 	private VoyageNumber voyage;
 
 	public HandlingActivity(final HandlingType type, final UnLocode location) {
-		this(type, location, null);
+		this(type, location, VoyageNumber.none());
 	}
 
 	public HandlingActivity(final HandlingType type, final UnLocode location,
 			final VoyageNumber voyage) {
 		Validate.notNull(type, "Handling event type is required");
 		Validate.notNull(location, "Location is required");
-
+		Validate.notNull(voyage,
+				"Voyage is required, you could use VoyageNumber.none() if you don't need one.");
 		this.type = type;
 		this.location = location;
 		this.voyage = voyage;

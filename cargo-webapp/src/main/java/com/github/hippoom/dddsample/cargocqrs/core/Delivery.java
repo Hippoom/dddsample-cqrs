@@ -176,7 +176,7 @@ public class Delivery {
 				&& lastHandlingEvent != null) {
 			return lastHandlingEvent.voyage();
 		} else {
-			return null;
+			return VoyageNumber.none();
 		}
 	}
 

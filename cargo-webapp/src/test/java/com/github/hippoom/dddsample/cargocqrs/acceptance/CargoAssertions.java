@@ -26,7 +26,7 @@ public class CargoAssertions {
 
 	public static void theNextExpectedHandlingActivityOf(ResultActions cargo,
 			String type, String location) throws Exception {
-		theNextExpectedHandlingActivityOf(cargo, type, null, location);
+		theNextExpectedHandlingActivityOf(cargo, type, "", location);
 	}
 
 	public static void theNextExpectedHandlingActivityOf(ResultActions cargo,
@@ -88,6 +88,6 @@ public class CargoAssertions {
 	}
 
 	public static String isNone() {
-		return null;
+		return "";
 	}
 }

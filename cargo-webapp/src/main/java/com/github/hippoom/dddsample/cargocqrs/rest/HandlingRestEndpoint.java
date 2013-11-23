@@ -39,7 +39,8 @@ public class HandlingRestEndpoint {
 	}
 
 	private VoyageNumber voyage(String number) {
-		return StringUtils.isNotBlank(number) ? new VoyageNumber(number) : null;
+		return StringUtils.isNotBlank(number) ? new VoyageNumber(number)
+				: VoyageNumber.none();
 	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)
